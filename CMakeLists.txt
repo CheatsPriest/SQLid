@@ -12,7 +12,7 @@ endif()
 project ("SQLid")
 
 # Добавьте источник в исполняемый файл этого проекта.
-add_executable (SQLid "src/SQLid.cpp" "src/SQLid.h"   "src/files/MemoryMap.h" "src/files/MemoryMap.cpp" "src/files/MemoryMapWindows.h")
+add_executable (SQLid "src/SQLid.cpp" "src/SQLid.h"   "src/files/MemoryMap.h" "src/files/MemoryMap.cpp" "src/files/MemoryMapWindows.h" "src/files/DataBase.h" "src/files/InfoLoader.h")
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_property(TARGET SQLid PROPERTY CXX_STANDARD 20)

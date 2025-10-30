@@ -1,0 +1,4 @@
+256
+5
+name salary money gender text
+STRING 20 INT DOUBLE BOOL TEXT

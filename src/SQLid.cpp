@@ -3,16 +3,33 @@
 
 #include "SQLid.h"
 #include <thread>
-
+#include "files/InfoLoader.h"
 
 
 int main()
 {
 	
-	MemoryMap map("test.db", 12);
 
-	map.writeText(138, 0, "123456789ab");
-	std::cout << map.readText(138, 0, 8) << std::endl;
+	std::string name = "C:\\Users\\kuzne\\Desktop\\PetProjects\\SQLid\\out\\build\\x64-release\\test_info.db";
+	InfoLoader loader(name);
+
+	auto el = loader.loadNewInfo();
+
+	std::cout << el->lineLength<<std::endl;
+	std::cout << el->columnsNumber << std::endl;
+	for (auto& s : el->columns) {
+		std::cout << "NAME: "<<s.name << " OFFSET: " << s.offset << " SIZE: " << s.size << std::endl;
+	}
+	
+	int a;
+	std::cin >> a;
+
+	/*MemoryMap map("test.db", 12);
+
+	map.writeText(10, 0, "123456789ab");
+	auto str  = map.readText(10, 0, 8);
+	map.writeText(123, 0, "123456789ab");
+	std::cout << str << std::endl;*/
 	/*std::vector<std::jthread> pool;
 	pool.reserve(6);
 
