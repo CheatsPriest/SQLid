@@ -4,25 +4,52 @@
 #include "SQLid.h"
 #include <thread>
 #include "files/InfoLoader.h"
-
+#include "parser/Conditions.h"
+#include "parser/RequestParser.h"
+#include "data_base/DataBase.h"
 
 int main()
 {
-	
 
-	std::string name = "C:\\Users\\kuzne\\Desktop\\PetProjects\\SQLid\\out\\build\\x64-release\\test_info.db";
-	InfoLoader loader(name);
 
-	auto el = loader.loadNewInfo();
 
-	std::cout << el->lineLength<<std::endl;
-	std::cout << el->columnsNumber << std::endl;
-	for (auto& s : el->columns) {
-		std::cout << "NAME: "<<s.name << " OFFSET: " << s.offset << " SIZE: " << s.size << std::endl;
+	DataBase base;
+	base.openTabble("C:\\TestDataBase\\test", "test");
+
+	RequestParser parser;
+	auto result = parser.parse("SELECT age FROM test WHERE age == 10 AND age == 34 OR name == ""BABA"" LIMIT 100");
+
+	base.optimizeQuery(result);
+
+	std::cout << result.table_name << std::endl;
+	for (auto& el : result.columns_raw) {
+		std::cout << "NAME " << el << std::endl;
 	}
+	for (auto& el : result.raw_conditions) {
+		std::cout << "CONDOTION " << el << std::endl;
+	}
+	std::cout << result.limit << std::endl;
+
 	
-	int a;
-	std::cin >> a;
+
+	/*
+	
+
+	std::cout << result.table_name << std::endl;
+	for (auto& el : result.columns_raw) {
+		std::cout <<"NAME "<< el << std::endl;
+	}
+	for (auto& el : result.raw_conditions) {
+		std::cout << "CONDOTION "<<el << std::endl;
+	}
+	std::cout << result.limit << std::endl;*/
+
+	/*std::string files = "C:\\TestDataBase\\test";
+
+	Tabble base1(files);
+
+	Condition cond(ConditionType::EQUAL, 0, 10);
+	std::cout << cond.result(10) << std::endl;*/
 
 	/*MemoryMap map("test.db", 12);
 

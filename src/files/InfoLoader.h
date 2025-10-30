@@ -7,22 +7,13 @@
 #include <unordered_map>
 #include <atomic>
 #include <thread>
+#include "supported_variants.h"
 
 
 
-enum class Type { VOIDA = 0, INT32 = 1, INT64 = 2, DOUBLE= 3, FLOAT = 4, BOOL = 5, TEXT =6, STRING = 7 };
 
 
-static constexpr std::array<size_t, 8> type_sizes = {
-	0,  // VOIDA
-	sizeof(int),  // INT32
-	sizeof(long long),  // INT64  
-	sizeof(double),  // DOUBLE
-	sizeof(float),  // FLOAT
-	sizeof(bool),  // BOOL
-	128,  // TEXT 
-	0   // STRING - User decides on his own size
-};
+
 
 struct Column
 {
@@ -34,12 +25,14 @@ struct Column
 	Column() : name(""), offset(0), type(Type::VOIDA), size(0) {};
 };
 
-struct DataBaseInfo
+struct TabbleInfo
 {
 	size_t lineLength;
 	size_t columnsNumber;
 	std::vector<Column> columns;
-	DataBaseInfo() : lineLength(0), columnsNumber(0), columns(0) {};
+	std::unordered_map<std::string, size_t> columns_map;
+
+	TabbleInfo() : lineLength(0), columnsNumber(0), columns(0) {};
 };
 
 class InfoLoader {
@@ -54,7 +47,7 @@ private:
 
 	std::ifstream  in; // поток для чтения
 	std::string& name;
-	std::atomic<std::shared_ptr<DataBaseInfo>> info;
+	std::atomic<std::shared_ptr<TabbleInfo>> info;
 	std::atomic<bool> loading{ false };
 
 	bool loadFile() {
@@ -71,7 +64,7 @@ private:
 
 
 
-		DataBaseInfo newInfo;
+		TabbleInfo newInfo;
 		in >> newInfo.lineLength;
 		in >> newInfo.columnsNumber;
 		newInfo.columns.resize(newInfo.columnsNumber);
@@ -99,7 +92,12 @@ private:
 			}
 		}
 
-		info.store(std::make_shared<DataBaseInfo>(newInfo), std::memory_order_release);
+		size_t ind = 0;
+		for (Column& c : newInfo.columns) {
+			newInfo.columns_map.insert({ c.name, ind++ });
+		}
+
+		info.store(std::make_shared<TabbleInfo>(newInfo), std::memory_order_release);
 
 		loading.store(false, std::memory_order_release);
 
@@ -115,14 +113,20 @@ public:
 		if (!in.is_open()) {
 			throw std::runtime_error("Can not open the info file");
 		}
+		loadFile();
 	}
 
-	std::shared_ptr<DataBaseInfo> loadNewInfo() {
+	InfoLoader(const InfoLoader&) = delete;            // Явно запретить копирование
+	InfoLoader& operator=(const InfoLoader&) = delete;
+	InfoLoader(InfoLoader&&) = default;                // Разрешить перемещение
+	InfoLoader& operator=(InfoLoader&&) = default;
+
+	std::shared_ptr<TabbleInfo> loadNewInfo() {
 		loadFile();
 		return info.load(std::memory_order_acquire);
 	}
 
-	std::shared_ptr<DataBaseInfo> getCurrentInfo() const {
+	std::shared_ptr<TabbleInfo> getCurrentInfo() const {
 		return info.load(std::memory_order_acquire);
 	}
 

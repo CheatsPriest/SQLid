@@ -39,9 +39,9 @@ private:
 
 		return result;
 	}
-
-public:
 	MemoryMapWindows core;
+public:
+	
 	MemoryMap(const std::string& filename, size_t lineLength)
 		: core(filename, lineLength) {
 	}

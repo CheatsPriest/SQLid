@@ -12,10 +12,12 @@ endif()
 project ("SQLid")
 
 # Добавьте источник в исполняемый файл этого проекта.
-add_executable (SQLid "src/SQLid.cpp" "src/SQLid.h"   "src/files/MemoryMap.h" "src/files/MemoryMap.cpp" "src/files/MemoryMapWindows.h" "src/files/DataBase.h" "src/files/InfoLoader.h")
+add_executable (SQLid "src/SQLid.cpp" "src/SQLid.h"   "src/files/MemoryMap.h" "src/files/MemoryMap.cpp" "src/files/MemoryMapWindows.h" "src/files/Tabble.h" "src/files/InfoLoader.h" "src/parser/RequestParser.h" "src/parser/Query.h" "src/parser/Conditions.h" "src/supported_variants.h" "src/parser/Conditions.cpp" "src/data_base/DataBase.h")
+
+target_include_directories(SQLid PRIVATE src)
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
-  set_property(TARGET SQLid PROPERTY CXX_STANDARD 20)
+  set_property(TARGET SQLid PROPERTY CXX_STANDARD 23)
 endif()
 
 # TODO: Добавьте тесты и целевые объекты, если это необходимо.

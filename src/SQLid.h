@@ -4,5 +4,5 @@
 #pragma once
 
 #include <iostream>
-#include "files/MemoryMap.h"
+#include "files/Tabble.h"
 // TODO: установите здесь ссылки на дополнительные заголовки, требующиеся для программы.
