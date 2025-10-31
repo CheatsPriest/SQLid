@@ -3,7 +3,7 @@
 #include <functional>
 #include "supported_variants.h"
 
-enum class ConditionType { EQUAL=0, NOT_EQUAL=1, GREATER=2, LESS=3, AND=4, OR=5, LOGICAL_AND, LOGICAL_OR };
+enum class ConditionType { EQUAL=0, NOT_EQUAL=1, GREATER=2, LESS=3, AND=4, OR=5, LOGICAL_AND, LOGICAL_OR, DIRECT_INDEX };
 
 static std::unordered_map<std::string, ConditionType> condition_map{
     {"==", ConditionType::EQUAL},

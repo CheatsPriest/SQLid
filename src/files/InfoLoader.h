@@ -22,7 +22,7 @@ struct Column
 	size_t offset;
 	Type type;
 	size_t size;
-	Column() : name(""), offset(0), type(Type::VOIDA), size(0) {};
+	Column() : name(""), offset(1), type(Type::VOIDA), size(0) {};
 };
 
 struct TabbleInfo

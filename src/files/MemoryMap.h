@@ -6,19 +6,32 @@
 #include <shared_mutex>
 #include <array>
 #include <vector>
+#include <concepts>
+
+template<typename T>
+concept StringLike = std::is_same_v<std::decay_t<T>, std::string> ||
+std::is_same_v<std::decay_t<T>, std::string_view> ||
+std::is_convertible_v<T, const char*>;
+
+template<typename T>
+concept Numeric = std::is_arithmetic_v<std::decay_t<T>>;
 
 class MemoryMap {
 private:
+
 	static constexpr size_t STRIPE_COUNT = 128;
 	std::array<std::shared_mutex, STRIPE_COUNT> stripes;
-	
-	std::shared_mutex expand_end_mutex;
-
 	size_t get_stripe(size_t id) const {
 		return id % STRIPE_COUNT;
 	}
+
+	std::shared_mutex expand_end_mutex;
 	std::atomic<bool> expanding{ false };
 
+	
+	MemoryMapWindows core;
+public:
+	
 	bool expand() {
 		bool expected = false;
 		if (!expanding.compare_exchange_strong(expected, true)) {
@@ -27,7 +40,7 @@ private:
 			}
 			return false; // Уже кто-то расширяет
 		}
-		
+
 
 		std::vector<std::unique_lock<std::shared_mutex>> locks(STRIPE_COUNT);
 		for (auto& stripe : stripes) {
@@ -39,9 +52,7 @@ private:
 
 		return result;
 	}
-	MemoryMapWindows core;
-public:
-	
+
 	MemoryMap(const std::string& filename, size_t lineLength)
 		: core(filename, lineLength) {
 	}
@@ -60,7 +71,6 @@ public:
 	void writeNumber(size_t lineNumber, size_t offset, T value) {
 		if (core.getMaxLine() <= lineNumber) {
 			expand();
-			
 		}
 		std::unique_lock<std::shared_mutex> lock(stripes[get_stripe(lineNumber)]);
 		core.writeNumber<T>(lineNumber, offset, value);
@@ -69,7 +79,6 @@ public:
 	template<typename T>
 	T readNumber(size_t lineNumber, size_t offset = 0) {
 		std::shared_lock<std::shared_mutex> lock(stripes[get_stripe(lineNumber)]);
-
 		return core.readNumber<T>(lineNumber, offset);
 	}
 
@@ -85,6 +94,37 @@ public:
 		return core.readText(lineNumber, offset, size);
 	}
 
+	void activate(size_t lineNumber, size_t offset=0) {
+		std::unique_lock<std::shared_mutex> lock(stripes[get_stripe(lineNumber)]);
+		core.writeNumber<bool>(lineNumber, offset, true);
+	}
+	void deactivate(size_t lineNumber, size_t offset = 0) {
+		std::unique_lock<std::shared_mutex> lock(stripes[get_stripe(lineNumber)]);
+		core.writeNumber<bool>(lineNumber, offset, false);
+	}
+	bool isActive(size_t lineNumber, size_t offset = 0) {
+		std::shared_lock<std::shared_mutex> lock(stripes[get_stripe(lineNumber)]);
+		return core.readNumber<bool>(lineNumber, offset);
+	}
+	
+
+	template<typename T>
+	void writeInfo(size_t lineNumber, size_t offset, T&& value) {
+		std::cout << lineNumber << " " << offset << std::endl;
+		if constexpr (StringLike<T>) {
+			writeText(lineNumber, offset, std::forward<T>(value));
+		}
+		else if constexpr (Numeric<T>) {
+			writeNumber<std::decay_t<T>>(lineNumber, offset, std::forward<T>(value));
+		}
+		else {
+			static_assert(StringLike<T> || Numeric<T>, "T must be string-like or numeric");
+		}
+	}
+
+	size_t getMaxLines() {
+		return core.getMaxLine();
+	}
 private:
 	
 

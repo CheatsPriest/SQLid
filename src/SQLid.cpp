@@ -17,25 +17,32 @@ int main()
 	base.openTabble("C:\\TestDataBase\\test", "test");
 
 	RequestParser parser;
-	auto result = parser.parse("SELECT age FROM test WHERE age == 10 AND age == 34 OR name == ""BABA"" LIMIT 100");
+	auto result = parser.parse("SELECT age FROM test WHERE age == 10 AND ID == 1 AND age == 34 OR name == ""BABA"" LIMIT 100");
+	auto resultInsert = parser.parse("INSERT INTO test 10 ""BABA""");
+	base.optimize(result);
 
-	base.optimizeQuery(result);
+	auto ans2 = base.optimize(resultInsert);
+	
+	std::cout << ans2.messeage << std::endl;
 
-	std::cout << result.table_name << std::endl;
+	std::cout << 10 << std::endl;
+	
+	result;
+	/*std::cout << result.tabble_name << std::endl;
 	for (auto& el : result.columns_raw) {
 		std::cout << "NAME " << el << std::endl;
 	}
 	for (auto& el : result.raw_conditions) {
 		std::cout << "CONDOTION " << el << std::endl;
 	}
-	std::cout << result.limit << std::endl;
+	std::cout << result.limit << std::endl;*/
 
 	
 
 	/*
 	
 
-	std::cout << result.table_name << std::endl;
+	std::cout << result.tabble_name << std::endl;
 	for (auto& el : result.columns_raw) {
 		std::cout <<"NAME "<< el << std::endl;
 	}

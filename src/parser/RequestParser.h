@@ -3,9 +3,18 @@
 #include <string>
 #include <sstream>
 
+class IncorrectInput : public std::exception {
+
+public:
+
+	const char* what() const noexcept override {
+		return "Incorrect input";
+	}
+};
+
 class RequestParser {
 
-	void parseConditionAndLimit(Query& result, std::istringstream& str) {
+	void parseConditionAndLimit(SelectQuery& result, std::istringstream& str) {
 
 		std::string buf;
 		str >> buf;
@@ -21,47 +30,62 @@ class RequestParser {
 
 	}
 
-public:
-	RequestParser() {};
+	SelectQuery parseSelect(std::istringstream& str) {
+		SelectQuery result; 
+		std::string buf;
 
-	Query parse(const std::string& command) {
-
-		Query result;
-
-		std::istringstream str(command);
-
-		std::string queryType, buf;
-		str >> queryType;
-		if (queryType == "SELECT") {
-			result.type = QueryType::SELECT;
-
-			
-			while (true) {
-				str >> buf;
-				if (buf == "FROM")break;
-				result.columns_raw.push_back(std::move(buf));
-			}
-			str >> buf;
-			result.table_name = std::move(buf);
-
-			parseConditionAndLimit(result, str);
-
+		while (str >> buf) {
+			if (buf == "FROM")break;
+			result.columns_raw.push_back(std::move(buf));
 		}
-		else if (queryType == "UPDATE") {
-			result.type = QueryType::UPDATE;
+		if (buf != "FROM")throw IncorrectInput();
 
+		str >> buf;
+		result.tabble_name = std::move(buf);
 
-		}
-		else if (queryType == "DELETE") {
-			result.type = QueryType::ERASE;
+		parseConditionAndLimit(result, str);
 
-		}
-		else if (queryType == "INSERT") {
-			result.type = QueryType::INSERT;
+		return result;
+	}
 
+	InsertQuery parseInsert(std::istringstream& str) {
+		InsertQuery result;
+		std::string buf;
+		str >> buf;
+		if (buf != "INTO")throw IncorrectInput();
+
+		str >> result.tabble_name;
+
+		while (str >> buf) {
+			result.raw_values.push_back(std::move(buf));
 		}
 
 		return result;
+	}
+
+public:
+	RequestParser() {};
+
+	QueryVariant parse(const std::string& command) {
+
+		
+
+		std::istringstream str(command);
+
+		std::string queryType;
+		str >> queryType;
+		if (queryType == "SELECT") return parseSelect(str);
+		else if (queryType == "INSERT") return parseInsert(str);
+		else if (queryType == "DELETE") {
+			//result.type = QueryType::ERASE;
+
+		}
+		else if (queryType == "UPDATE") {
+			//result.type = QueryType::INSERT;
+
+		}
+
+		throw std::runtime_error("Unsupported command");
 	}
 
 };
