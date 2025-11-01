@@ -1,5 +1,6 @@
 #pragma once
 
+
 #include <vector>
 #include <string>
 #include "Conditions.h"
@@ -23,6 +24,10 @@ public:
     size_t limit = SIZE_MAX;
 
     // Методы которые будут у всех запросов
+
+	void writeColumns() {
+
+	}
 
     void optimizeConditions(std::shared_ptr<TabbleInfo> info) {
 
@@ -48,7 +53,7 @@ public:
 				else {
 					throw std::runtime_error("Incoreect operation");
 				}
-				Condition cur(conditionType, 0, 0);
+				Condition cur(conditionType, SIZE_MAX, 0);
 
 				conditions.push_back(std::move(cur));
 				++i;
@@ -109,7 +114,63 @@ public:
 class SelectQuery : public QueryBase<SelectQuery> {
 
 private:
-	
+private:
+	// Чтение одной записи
+	std::vector<variant_types> readRecord(Tabble& table, size_t line_id,
+		const std::vector<size_t>& column_ids,
+		const std::vector<Column>& columns) {
+		std::vector<variant_types> record;
+		record.reserve(column_ids.size() + 1);
+		record.push_back((int64_t)line_id); // ID записи
+
+		for (size_t col_id : column_ids) {
+			const auto& col = columns[col_id];
+			if (col.type == Type::TEXT || col.type == Type::STRING) {
+				record.push_back(std::string(table.readText(line_id, col.offset, col.size)));
+			}
+			else {
+				record.push_back(table.readNumber(line_id, col.offset, col.type));
+			}
+		}
+		return record;
+	}
+
+	//  Проверка условий
+	bool satisfiesConditions(Tabble& table, size_t line_id,
+		const std::vector<Condition>& conditions,
+		const std::vector<Column>& columns) {
+		bool current_result = false;
+		ConditionType logic_op = ConditionType::LOGICAL_OR;
+
+		for (const auto& cond : conditions) {
+			if (cond.collumn_id == SIZE_MAX) {
+				logic_op = cond.cond_type; // AND/OR
+				continue;
+			}
+
+			const auto& col = columns[cond.collumn_id];
+			bool condition_met = false;
+
+			if (col.type == Type::TEXT || col.type == Type::STRING) {
+				auto record_value = table.readText(line_id, col.offset, col.size);
+				condition_met = (std::get<std::string>(cond.desired) == record_value);
+			}
+			else {
+				auto record_value = table.readNumber(line_id, col.offset, col.type);
+				condition_met = (cond.desired == record_value);
+			}
+
+			// Применяем логический оператор
+			if (logic_op == ConditionType::LOGICAL_OR) {
+				current_result = current_result || condition_met;
+			}
+			else { // LOGICAL_AND
+				current_result = current_result && condition_met;
+			}
+		}
+
+		return current_result;
+	}
 
 public:
     std::vector<std::string> columns_raw;
@@ -127,42 +188,33 @@ public:
 		this->optimizeColumns(info);     // Своя логика
 	}
 
-	Result executeSelect(Tabble& tabble, std::shared_ptr<TabbleInfo>& info) {
-		Result cur;
-
-		size_t maxLine = min(tabble().getMaxLines(), limit);
-
-		auto& storage = tabble();//Do not judge me, I am lazy
+	//I know what you will say. I know that it is bad function.
+	Result executeSelect(Tabble& table, std::shared_ptr<TabbleInfo>& info) {
+		Result result;
+		auto& storage = table();
 		auto& columns = info->columns;
 
-		size_t active = tabble.getActivePlaces();
-		size_t ind = 0;
-
-		size_t columns_size = columns_optimized.size();
-
-		if (conditions.size() == 0) {
-
-			cur.body.resize(active);
-			for (size_t i = 0; i < maxLine and ind<active; ++i) {
-
-				if (!storage.isActive(i))continue;
-				auto& ptr = cur.body[ind];
-				ptr.reserve(columns_size);
-				
-				for (auto& id : columns_optimized) {
-					if (columns[id].type != Type::TEXT and columns[id].type != Type::STRING) {
-						ptr.push_back(tabble.readNumber(i, columns[id].offset, columns[id].type));
-					}
-					else {
-						ptr.push_back(std::string(tabble.readText(i, columns[id].offset, columns[id].size)));
-					}
-				}
-				++ind;
-
-			}
+		// ?? DIRECT INDEX - O(1) оптимизация
+		if (!conditions.empty() && conditions[0].cond_type == ConditionType::DIRECT_INDEX) {
+			int64_t line_id = std::get<int64_t>(conditions[0].desired);
+			result.body.push_back(readRecord(table, line_id, columns_optimized, columns));
+			return result;
 		}
 
-		return cur;
+		//  FULL SCAN с фильтрацией
+		size_t max_line = min(storage.getMaxLines(), limit);
+		size_t active_count = table.getActivePlaces();
+
+		result.body.reserve(active_count);
+
+		for (int64_t i = 0; i < max_line && result.body.size() < active_count; ++i) {
+			if (!storage.isActive(i)) continue;
+			if (!satisfiesConditions(table, i, conditions, columns)) continue;
+
+			result.body.push_back(readRecord(table, i, columns_optimized, columns));
+		}
+
+		return result;
 	}
 	
 	Result execute(Tabble& tabble, std::shared_ptr<TabbleInfo>& info) {

@@ -21,14 +21,14 @@ int main()
 	RequestParser parser;
 
 	//auto result = parser.parse("SELECT age FROM test WHERE age == 10 AND ID == 1 AND age == 34 OR name == ""BABA"" LIMIT 100");
-	auto result = parser.parse("SELECT age name FROM test");
+	auto result = parser.parse("SELECT age name FROM test WHERE name == ""s"" OR age == 31 LIMIT 1" );
 	auto reply = base.optimize(result);
 
 	
 	
 	for (auto& row : reply.body) {
 		if (row.size() == 0)break;
-		std::cout << std::get<int32_t>(row[0])<<" "<< std::get<std::string>(row[1]) << std::endl;
+		std::cout << std::get<int64_t>(row[0])<<" "<<" "<< std::get<int32_t>(row[1])<<" "<< std::get<std::string>(row[2]) << std::endl;
 		std::cout << std::endl;
 	}
 	
