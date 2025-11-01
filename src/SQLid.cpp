@@ -8,38 +8,51 @@
 #include "parser/RequestParser.h"
 #include "data_base/DataBase.h"
 #include <chrono>
-#include <thread>
+
+
 
 int main()
 {
 
-
+	
 
 	DataBase base;
 	base.openTabble("C:\\TestDataBase\\test", "test");
 
 	RequestParser parser;
 
-	/*auto del1 = parser.parse("DELETE FROM test WHERE age == 100");
-	auto replyDel1 = base.optimize(del1);*/
+	auto insert1 = parser.parse("INSERT INTO test 100 WUWU");
+	auto select1 = parser.parse("SELECT age name FROM test WHERE age < 100 AND name > ""BABA""");
+	auto delete1 = parser.parse("DELETE FROM test WHERE age == 100");
 
-	//auto result = parser.parse("SELECT age FROM test WHERE age == 10 AND ID == 1 AND age == 34 OR name == ""BABA"" LIMIT 100");
-	auto result = parser.parse("SELECT age name FROM test WHERE age < 100 OR name == ""NEWa""");
-	auto reply = base.optimize(result);
+	base.optimizing(insert1);
+	base.optimizing(select1);
+	base.optimizing(delete1);
 
-	
-	
-	for (auto& row : reply.body) {
-		if (row.size() == 0)break;
-		std::cout << std::get<int64_t>(row[0])<<" "<<" "<< std::get<int32_t>(row[1])<<" "<< std::get<std::string>(row[2]) << std::endl;
-		std::cout << std::endl;
-	}
-	
+	insert1;
+	select1;
+	delete1;
 
-	{
-		auto insert = parser.parse("INSERT INTO test 100 ""NEWa""");
-		base.optimize(insert);
-	}
+	//auto del1 = parser.parse("DELETE FROM test WHERE age == 100");
+	//auto replyDel1 = base.optimize(del1);
+
+	////auto result = parser.parse("SELECT age FROM test WHERE age == 10 AND ID == 1 AND age == 34 OR name == ""BABA"" LIMIT 100");
+	//auto result = parser.parse("SELECT age name FROM test WHERE age < 100 OR name == ""NEWa""");
+	//auto reply = base.optimize(result);
+
+	//
+	//
+	//for (auto& row : reply.body) {
+	//	if (row.size() == 0)break;
+	//	std::cout << std::get<int64_t>(row[0])<<" "<<" "<< std::get<int32_t>(row[1])<<" "<< std::get<std::string>(row[2]) << std::endl;
+	//	std::cout << std::endl;
+	//}
+	//
+
+	//{
+	//	auto insert = parser.parse("INSERT INTO test 100 ""NEWa""");
+	//	base.optimize(insert);
+	//}
 	/*{
 		auto insert = parser.parse("INSERT INTO test 31 ""SASA""");
 		base.optimize(insert);
@@ -68,7 +81,7 @@ int main()
 
 	std::cout << 10 << std::endl;
 	
-	result;
+	
 	/*std::cout << result.tabble_name << std::endl;
 	for (auto& el : result.columns_raw) {
 		std::cout << "NAME " << el << std::endl;

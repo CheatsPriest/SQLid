@@ -12,7 +12,7 @@ endif()
 project ("SQLid")
 
 # Добавьте источник в исполняемый файл этого проекта.
-add_executable (SQLid "src/SQLid.cpp" "src/SQLid.h"   "src/files/MemoryMap.h" "src/files/MemoryMap.cpp" "src/files/MemoryMapWindows.h" "src/files/Tabble.h" "src/files/InfoLoader.h" "src/parser/RequestParser.h" "src/parser/Query.h" "src/parser/Conditions.h" "src/supported_variants.h" "src/parser/Conditions.cpp" "src/data_base/DataBase.h"  "src/result/Result.h")
+add_executable (SQLid "src/SQLid.cpp" "src/SQLid.h"   "src/files/MemoryMap.h" "src/files/MemoryMap.cpp" "src/files/MemoryMapWindows.h" "src/files/Tabble.h" "src/files/InfoLoader.h" "src/parser/RequestParser.h" "src/parser/Query.h" "src/parser/Conditions.h" "src/supported_variants.h" "src/parser/Conditions.cpp" "src/data_base/DataBase.h"  "src/result/Result.h" "src/files/Optimizer.h")
 
 target_include_directories(SQLid PRIVATE src)
 

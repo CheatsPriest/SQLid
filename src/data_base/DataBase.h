@@ -3,13 +3,13 @@
 #include <vector>
 #include <unordered_map>
 #include <shared_mutex>
-
+#include "files/Optimizer.h"
 
 //TO DO: ƒобавить подгрузку данных самой базы данных при запуске
 class DataBase {
 private:
 
-	
+	Optimizer optim;
 
 	std::vector<std::unique_ptr<Tabble>> tabbles;
 
@@ -46,6 +46,21 @@ public:
 		return true;
 	}
 
+
+	void optimizing(QueryVariant& query_var) {
+
+		std::string tabble_name = std::visit([](auto&& query) -> std::string {
+			return query.tabble_name;  // работает благодар€ CRTP
+			}, query_var);
+
+		size_t id = getTabbleId(tabble_name);
+
+		Tabble& tabble = *tabbles[id];
+		auto info = tabble.getInfo();
+
+		optim.optimize(query_var, tabble.getInfo());
+
+	}
 
 	Result optimize(QueryVariant& query_var) {
 		return std::visit([this](auto& query) {
