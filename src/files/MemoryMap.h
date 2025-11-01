@@ -110,7 +110,7 @@ public:
 
 	template<typename T>
 	void writeInfo(size_t lineNumber, size_t offset, T&& value) {
-		std::cout << lineNumber << " " << offset << std::endl;
+		
 		if constexpr (StringLike<T>) {
 			writeText(lineNumber, offset, std::forward<T>(value));
 		}

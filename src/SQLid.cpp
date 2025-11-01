@@ -7,6 +7,8 @@
 #include "parser/Conditions.h"
 #include "parser/RequestParser.h"
 #include "data_base/DataBase.h"
+#include <chrono>
+#include <thread>
 
 int main()
 {
@@ -17,13 +19,46 @@ int main()
 	base.openTabble("C:\\TestDataBase\\test", "test");
 
 	RequestParser parser;
-	auto result = parser.parse("SELECT age FROM test WHERE age == 10 AND ID == 1 AND age == 34 OR name == ""BABA"" LIMIT 100");
-	auto resultInsert = parser.parse("INSERT INTO test 10 ""BABA""");
-	base.optimize(result);
 
-	auto ans2 = base.optimize(resultInsert);
+	//auto result = parser.parse("SELECT age FROM test WHERE age == 10 AND ID == 1 AND age == 34 OR name == ""BABA"" LIMIT 100");
+	auto result = parser.parse("SELECT age name FROM test");
+	auto reply = base.optimize(result);
+
 	
-	std::cout << ans2.messeage << std::endl;
+	
+	for (auto& row : reply.body) {
+		if (row.size() == 0)break;
+		std::cout << std::get<int32_t>(row[0])<<" "<< std::get<std::string>(row[1]) << std::endl;
+		std::cout << std::endl;
+	}
+	
+
+	
+	/*{
+		auto insert = parser.parse("INSERT INTO test 31 ""SASA""");
+		base.optimize(insert);
+	}
+	{
+		auto insert = parser.parse("INSERT INTO test 32 ""VANA""");
+		base.optimize(insert);
+	}
+	{
+		auto insert = parser.parse("INSERT INTO test 33 ""SERG""");
+		base.optimize(insert);
+	}
+	{
+		auto insert = parser.parse("INSERT INTO test 34 ""VOVA""");
+		base.optimize(insert);
+	}
+	{
+		auto insert = parser.parse("INSERT INTO test 35 ""SHIL""");
+		base.optimize(insert);
+	}
+	{
+		auto insert = parser.parse("INSERT INTO test 10 ""BABA""");
+		base.optimize(insert);
+	}*/
+	
 
 	std::cout << 10 << std::endl;
 	

@@ -156,7 +156,7 @@ public:
 	// Чтение любого числа
 	template<typename T>
 	T readNumber(size_t lineNumber, size_t offset = 0) {
-		static_assert(std::is_arithmetic_v<T>, "T must be numeric");
+		//static_assert(std::is_arithmetic_v<T>, "T must be numeric");
 		T value;
 		char* lineStart = findLine(lineNumber) + offset;
 		memcpy(&value, lineStart, sizeof(T));

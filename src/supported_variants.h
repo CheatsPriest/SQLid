@@ -1,6 +1,7 @@
 #pragma once
 #include <variant>
 #include <string>
+#include <stdexcept>
 
 using variant_types = std::variant<int32_t, int64_t, double, float, bool, std::string>;
 enum class Type { VOIDA = 0, INT32 = 1, INT64 = 2, DOUBLE = 3, FLOAT = 4, BOOL = 5, TEXT = 6, STRING = 7 };

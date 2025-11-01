@@ -107,6 +107,10 @@ public:
 
 
 class SelectQuery : public QueryBase<SelectQuery> {
+
+private:
+	
+
 public:
     std::vector<std::string> columns_raw;
     std::vector<size_t> columns_optimized;
@@ -122,13 +126,51 @@ public:
 		this->optimizeConditions(info);  // Из базового
 		this->optimizeColumns(info);     // Своя логика
 	}
+
+	Result executeSelect(Tabble& tabble, std::shared_ptr<TabbleInfo>& info) {
+		Result cur;
+
+		size_t maxLine = min(tabble().getMaxLines(), limit);
+
+		auto& storage = tabble();//Do not judge me, I am lazy
+		auto& columns = info->columns;
+
+		size_t active = tabble.getActivePlaces();
+		size_t ind = 0;
+
+		size_t columns_size = columns_optimized.size();
+
+		if (conditions.size() == 0) {
+
+			cur.body.resize(active);
+			for (size_t i = 0; i < maxLine and ind<active; ++i) {
+
+				if (!storage.isActive(i))continue;
+				auto& ptr = cur.body[ind];
+				ptr.reserve(columns_size);
+				
+				for (auto& id : columns_optimized) {
+					if (columns[id].type != Type::TEXT and columns[id].type != Type::STRING) {
+						ptr.push_back(tabble.readNumber(i, columns[id].offset, columns[id].type));
+					}
+					else {
+						ptr.push_back(std::string(tabble.readText(i, columns[id].offset, columns[id].size)));
+					}
+				}
+				++ind;
+
+			}
+		}
+
+		return cur;
+	}
 	
 	Result execute(Tabble& tabble, std::shared_ptr<TabbleInfo>& info) {
-		Result cur;
+		
 		//this->executeInsert(tabble, info);
 
 
-		return cur;
+		return this->executeSelect(tabble, info);
 	}
 };
 
@@ -176,7 +218,6 @@ public:
 	Result execute(Tabble& tabble, std::shared_ptr<TabbleInfo>& info) {
 		
 		return executeInsert(tabble, info);
-
 
 	}
 

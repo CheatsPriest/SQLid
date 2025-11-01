@@ -26,13 +26,16 @@ private:
     std::stack<size_t> stack_freeId;
     std::atomic<size_t> freeId = 0;
 
+    std::atomic<size_t> activePlaces;
+
     void analyzeHoles() {
         std::unique_lock lock(stack_mtx);
 
         size_t maxLine = storage.getMaxLines();
         size_t ind = 0;
-        while (storage.isActive(ind) and ind < maxLine) {
+        while (ind < maxLine and storage.isActive(ind)) {
             ++ind;
+            activePlaces.fetch_add(1);
         }
         if (ind == maxLine)storage.expand();
 
@@ -44,6 +47,7 @@ private:
                 else {
                     freeId = ind;
                 }
+                activePlaces.fetch_add(1);
                 break;
             }
             maxLine--;
@@ -52,6 +56,9 @@ private:
         for (; ind < maxLine; ++ind) {
             if (!storage.isActive(ind)) {
                 stack_freeId.push(ind);
+            }
+            else {
+                activePlaces.fetch_add(1);
             }
         }
     }
@@ -70,8 +77,12 @@ private:
 
 
         size_t cur = freeId.load(std::memory_order_acquire);
+        if (cur >= storage.getMaxLines()) {
+            storage.expand();
+        }
 
-        freeId++;
+        activePlaces.fetch_add(1, std::memory_order_release);
+        freeId.fetch_add(1, std::memory_order_release);
 
         return cur;
     }
@@ -101,6 +112,10 @@ public:
         return storage;
     }
 
+    size_t getActivePlaces() const {
+        return activePlaces.load(std::memory_order_acquire);
+    }
+
     std::shared_ptr<TabbleInfo> getInfo() {
         return loader.getCurrentInfo();
     }
@@ -125,6 +140,24 @@ public:
             
         }
         return cur;
+    }
+
+    variant_types readNumber(size_t line, size_t offset, Type type) {
+        switch (type) {
+        case Type::INT32: return storage.readNumber<int32_t>(line, offset);
+        case Type::INT64: return storage.readNumber<int64_t>(line, offset);
+        case Type::DOUBLE: return storage.readNumber<double>(line, offset);
+        case Type::FLOAT: return storage.readNumber<float>(line, offset);
+        case Type::BOOL: return storage.readNumber<bool>(line, offset);
+        };
+    }
+    std::string_view readText(size_t line, size_t offset, size_t size=0) {
+        if (size == 0) {
+            return storage.readText(line, offset, 128);
+        }
+        else {
+            return storage.readText(line, offset, size);
+        }
     }
 
 };
