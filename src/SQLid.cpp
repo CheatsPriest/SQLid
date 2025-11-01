@@ -20,8 +20,11 @@ int main()
 
 	RequestParser parser;
 
+	/*auto del1 = parser.parse("DELETE FROM test WHERE age == 100");
+	auto replyDel1 = base.optimize(del1);*/
+
 	//auto result = parser.parse("SELECT age FROM test WHERE age == 10 AND ID == 1 AND age == 34 OR name == ""BABA"" LIMIT 100");
-	auto result = parser.parse("SELECT age name FROM test WHERE name == ""s"" OR age == 31 LIMIT 1" );
+	auto result = parser.parse("SELECT age name FROM test WHERE age < 100 OR name == ""NEWa""");
 	auto reply = base.optimize(result);
 
 	
@@ -33,7 +36,10 @@ int main()
 	}
 	
 
-	
+	{
+		auto insert = parser.parse("INSERT INTO test 100 ""NEWa""");
+		base.optimize(insert);
+	}
 	/*{
 		auto insert = parser.parse("INSERT INTO test 31 ""SASA""");
 		base.optimize(insert);

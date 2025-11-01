@@ -14,7 +14,8 @@ public:
 
 class RequestParser {
 
-	void parseConditionAndLimit(SelectQuery& result, std::istringstream& str) {
+	template<typename Query>
+	void parseConditionAndLimit(Query& result, std::istringstream& str) {
 
 		std::string buf;
 		str >> buf;
@@ -63,6 +64,21 @@ class RequestParser {
 		return result;
 	}
 
+	DeleteQuery parseDelete(std::istringstream& str) {
+		DeleteQuery result;
+		std::string buf;
+		str >> buf;
+		if (buf != "FROM")throw IncorrectInput();
+
+		str >> result.tabble_name;
+		
+		
+
+		parseConditionAndLimit(result, str);
+
+		return result;
+	}
+
 public:
 	RequestParser() {};
 
@@ -76,10 +92,7 @@ public:
 		str >> queryType;
 		if (queryType == "SELECT") return parseSelect(str);
 		else if (queryType == "INSERT") return parseInsert(str);
-		else if (queryType == "DELETE") {
-			//result.type = QueryType::ERASE;
-
-		}
+		else if (queryType == "DELETE") return parseDelete(str);
 		else if (queryType == "UPDATE") {
 			//result.type = QueryType::INSERT;
 

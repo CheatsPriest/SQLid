@@ -21,9 +21,11 @@ private:
     std::string nameForLoader;
     InfoLoader loader;
     MemoryMap storage;
-
+    
+    //To Do: Change it to lock-free stack
     std::mutex stack_mtx;
     std::stack<size_t> stack_freeId;
+
     std::atomic<size_t> freeId = 0;
 
     std::atomic<size_t> activePlaces;
@@ -61,6 +63,11 @@ private:
                 activePlaces.fetch_add(1);
             }
         }
+    }
+
+    void pushInStack(size_t ind) {
+        std::lock_guard<std::mutex> lock(stack_mtx);
+        stack_freeId.push(ind);
     }
 
     size_t allocateId() {
@@ -140,6 +147,13 @@ public:
             
         }
         return cur;
+    }
+
+    size_t erase(size_t line) {
+        storage.deactivate(line);
+        pushInStack(line);
+        activePlaces.fetch_sub(1, std::memory_order_acq_rel);//I have no idea what I have to set here
+        return line;
     }
 
     variant_types readNumber(size_t line, size_t offset, Type type) {

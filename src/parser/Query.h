@@ -25,9 +25,7 @@ public:
 
     // Методы которые будут у всех запросов
 
-	void writeColumns() {
-
-	}
+	
 
     void optimizeConditions(std::shared_ptr<TabbleInfo> info) {
 
@@ -107,13 +105,55 @@ public:
     // CRTP trick - доступ к производному классу
     Derived& derived() { return static_cast<Derived&>(*this); }
     const Derived& derived() const { return static_cast<const Derived&>(*this); }
+
+
+
+protected:
+	//  Проверка условий
+	bool satisfiesConditions(Tabble& table, size_t line_id,
+		std::vector<Condition>& conditions,
+		std::vector<Column>& columns) {
+		bool current_result = false;
+		ConditionType logic_op = ConditionType::LOGICAL_OR;
+
+		for (Condition& cond : conditions) {
+			if (cond.collumn_id == SIZE_MAX) {
+				logic_op = cond.cond_type; // AND/OR
+				continue;
+			}
+
+
+
+			const auto& col = columns[cond.collumn_id];
+			bool condition_met = false;
+
+			if (col.type == Type::TEXT || col.type == Type::STRING) {
+				auto record_value = table.readText(line_id, col.offset, col.size);
+				condition_met = cond.result(std::string(record_value));
+			}
+			else {
+				auto record_value = table.readNumber(line_id, col.offset, col.type);
+				condition_met = cond.result(record_value);
+			}
+
+			// Применяем логический оператор
+			if (logic_op == ConditionType::LOGICAL_OR) {
+				current_result = current_result || condition_met;
+			}
+			else { // LOGICAL_AND
+				current_result = current_result && condition_met;
+			}
+		}
+
+		return current_result;
+	}
 };
 
 
 
 class SelectQuery : public QueryBase<SelectQuery> {
 
-private:
+
 private:
 	// Чтение одной записи
 	std::vector<variant_types> readRecord(Tabble& table, size_t line_id,
@@ -135,42 +175,7 @@ private:
 		return record;
 	}
 
-	//  Проверка условий
-	bool satisfiesConditions(Tabble& table, size_t line_id,
-		const std::vector<Condition>& conditions,
-		const std::vector<Column>& columns) {
-		bool current_result = false;
-		ConditionType logic_op = ConditionType::LOGICAL_OR;
-
-		for (const auto& cond : conditions) {
-			if (cond.collumn_id == SIZE_MAX) {
-				logic_op = cond.cond_type; // AND/OR
-				continue;
-			}
-
-			const auto& col = columns[cond.collumn_id];
-			bool condition_met = false;
-
-			if (col.type == Type::TEXT || col.type == Type::STRING) {
-				auto record_value = table.readText(line_id, col.offset, col.size);
-				condition_met = (std::get<std::string>(cond.desired) == record_value);
-			}
-			else {
-				auto record_value = table.readNumber(line_id, col.offset, col.type);
-				condition_met = (cond.desired == record_value);
-			}
-
-			// Применяем логический оператор
-			if (logic_op == ConditionType::LOGICAL_OR) {
-				current_result = current_result || condition_met;
-			}
-			else { // LOGICAL_AND
-				current_result = current_result && condition_met;
-			}
-		}
-
-		return current_result;
-	}
+	
 
 public:
     std::vector<std::string> columns_raw;
@@ -194,7 +199,7 @@ public:
 		auto& storage = table();
 		auto& columns = info->columns;
 
-		// ?? DIRECT INDEX - O(1) оптимизация
+		//  DIRECT INDEX - O(1) оптимизация
 		if (!conditions.empty() && conditions[0].cond_type == ConditionType::DIRECT_INDEX) {
 			int64_t line_id = std::get<int64_t>(conditions[0].desired);
 			result.body.push_back(readRecord(table, line_id, columns_optimized, columns));
@@ -276,9 +281,57 @@ public:
 };
 
 
+class DeleteQuery : public QueryBase<DeleteQuery>{
+public:
+
+
+	void optimizeImpl(std::shared_ptr<TabbleInfo> info) {
+		this->optimizeConditions(info);  // Из базового
+	}
+
+	Result executeDelete(Tabble& tabble, std::shared_ptr<TabbleInfo>& info) {
+		Result result;
+
+		auto& storage = tabble();
+		auto& columns = info->columns;
+
+		//  DIRECT INDEX - O(1) оптимизация
+		if (!conditions.empty() && conditions[0].cond_type == ConditionType::DIRECT_INDEX) {
+			int64_t line_id = std::get<int64_t>(conditions[0].desired);
+			if (storage.isActive(line_id)) {
+				tabble.erase(line_id);
+				result.isSucces = true;
+			}
+			
+			return result;
+		}
+
+		//  FULL SCAN с фильтрацией
+		size_t max_line = min(storage.getMaxLines(), limit);
+		size_t active_count = tabble.getActivePlaces();
+
+		result.body.reserve(active_count);
+
+		for (int64_t i = 0; i < max_line && result.body.size() < active_count; ++i) {
+			if (!storage.isActive(i)) continue;
+			if (!satisfiesConditions(tabble, i, conditions, columns)) continue;
+
+			tabble.erase(i);
+		}
+		result.isSucces = true;
+		return result;
+	}
+
+	Result execute(Tabble& tabble, std::shared_ptr<TabbleInfo>& info) {
+
+		return this->executeDelete(tabble, info);
+	}
+
+};
+
 using QueryVariant = std::variant<
     SelectQuery,
     //UpdateQuery,
-    InsertQuery
-    //DeleteQuery
+    InsertQuery,
+    DeleteQuery
 >;
