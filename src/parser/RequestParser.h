@@ -79,6 +79,35 @@ class RequestParser {
 		return result;
 	}
 
+	UpdateQuery parseUpdate(std::istringstream& str) {
+		UpdateQuery result;
+		std::string buf;
+		str >> result.tabble_name;
+		str >> buf;
+		if (buf != "SET") throw IncorrectInput();
+
+		while (str >> buf) {
+			if (buf == "WHERE")break;
+			result.columns_raw.push_back(std::move(buf));
+			str >> buf;
+			if(buf!="=")throw IncorrectInput();
+			str >> buf;
+			result.raw_values.push_back(std::move(buf));
+		}
+
+
+		while (str >> buf) {
+			if (buf == "LIMIT")break;
+			result.raw_conditions.push_back(std::move(buf));
+		}
+
+		if (buf == "LIMIT") {
+			str >> result.limit;
+		}
+
+		return result;
+	}
+
 public:
 	RequestParser() {};
 
@@ -93,10 +122,7 @@ public:
 		if (queryType == "SELECT") return parseSelect(str);
 		else if (queryType == "INSERT") return parseInsert(str);
 		else if (queryType == "DELETE") return parseDelete(str);
-		else if (queryType == "UPDATE") {
-			//result.type = QueryType::INSERT;
-
-		}
+		else if (queryType == "UPDATE") return parseUpdate(str);
 
 		throw std::runtime_error("Unsupported command");
 	}

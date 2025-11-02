@@ -58,20 +58,11 @@ public:
 		Tabble& tabble = *tabbles[id];
 		auto info = tabble.getInfo();
 
-		optim.optimize(query_var, tabble.getInfo());
+		optim.optimize(query_var, tabble.getInfo(), tabble);
 
 	}
 
-	Result optimize(QueryVariant& query_var) {
-		return std::visit([this](auto& query) {
-			// Всё внутри visit
-			size_t id = getTabbleId(query.tabble_name);
-			Tabble& tabble = *tabbles[id];
-			auto info = tabble.getInfo();
-			query.optimizeImpl(info);
-			return query.execute(tabble, info);
-			}, query_var);
-	}
+	
 
 	
 };

@@ -9,13 +9,9 @@
 //I am happy with the encapsulation violation
 class Optimizer {
 private:
-	
-	
-public:
-
 	template<typename T>
 	void optimizeConditions(QueryBase<T>& query, std::shared_ptr<TabbleInfo>& info) {
-		
+
 		std::string columnName;
 		std::string oper;
 		std::string valueStr;
@@ -100,7 +96,7 @@ public:
 	}
 
 	template<typename T>
-	void optimizeValues(T& query, std::shared_ptr<TabbleInfo>& info) {
+	void optimizeInsertValues(T& query, std::shared_ptr<TabbleInfo>& info) {
 
 		size_t i = 0;
 		for (Column& column : info->columns) {
@@ -110,19 +106,39 @@ public:
 
 	}
 	
-	void optimize(QueryVariant& query, std::shared_ptr<TabbleInfo> info) {
+	void optimizeUpdateValues(UpdateQuery& query, std::shared_ptr<TabbleInfo>& info) {
 
-		std::visit([&info, this](auto& query) {
+		size_t i = 0;
+		for (size_t id : query.columns_optimized) {
+			query.values.push_back(parse_value(query.raw_values.at(i), info->columns[id].type));
+			++i;
+		}
+
+	}
+
+public:
+
+	
+	
+	void optimize(QueryVariant& query, std::shared_ptr<TabbleInfo> info, Tabble& table) {
+
+		std::visit([&info, &table, this](auto& query) {
 			using T = std::decay_t<decltype(query)>;
+			query.table_ptr = &table;
 			if constexpr (std::is_same_v<T, SelectQuery>) {
 				optimizeConditions(query, info);
 				optimizeColumns(query, info);
 			}
 			if constexpr (std::is_same_v<T, InsertQuery>) {
-				optimizeValues(query, info);
+				optimizeInsertValues(query, info);
 			}
 			if constexpr (std::is_same_v<T, DeleteQuery>) {
 				optimizeConditions(query, info);
+			}
+			if constexpr (std::is_same_v<T, UpdateQuery>) {
+				optimizeColumns(query, info);
+				optimizeConditions(query, info);
+				optimizeUpdateValues(query, info);
 			}
 			//חהוסב update
 

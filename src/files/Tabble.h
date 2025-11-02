@@ -47,7 +47,7 @@ private:
             if (storage.isActive(maxLine) or maxLine==ind) {
                 if(storage.isActive(ind))freeId = maxLine + 1;
                 else {
-                    freeId = ind;
+                    freeId = maxLine;
                 }
                 activePlaces.fetch_add(1);
                 break;
@@ -118,13 +118,38 @@ public:
     MemoryMap& operator()() {
         return storage;
     }
+    MemoryMap& getStoarge() {
+        return storage;
+    }
+
 
     size_t getActivePlaces() const {
         return activePlaces.load(std::memory_order_acquire);
     }
+    size_t getMaxActiveLine() const {
+        return freeId.load(std::memory_order_acquire);
+    }
 
     std::shared_ptr<TabbleInfo> getInfo() {
         return loader.getCurrentInfo();
+    }
+
+    void update(const std::vector<variant_types>& values, const std::vector<Column>& columns, size_t cur) {
+      
+     
+        for (size_t i = 0; i < values.size(); ++i) {
+            auto& value = values[i];
+            auto& column = columns[i];
+
+
+            std::visit([this, cur, offset = column.offset](auto&& val) {
+                storage.writeInfo(cur, offset, std::forward<decltype(val)>(val));
+                }, value);
+
+            // Помечаем запись как активную
+
+        }
+        
     }
 
     size_t insert(const std::vector<variant_types>& values, const std::vector<Column>& columns) {
@@ -134,18 +159,8 @@ public:
 
         size_t current_offset = 1; // Начинаем после флага активности
 
-        for (size_t i = 0; i < values.size(); ++i) {
-            auto& value = values[i];
-            auto& column = columns[i];
-            
-
-            std::visit([this, cur, offset = column.offset](auto&& val) {
-                storage.writeInfo(cur, offset, std::forward<decltype(val)>(val));
-                }, value);
-
-            // Помечаем запись как активную
-            
-        }
+        update(values, columns, cur);
+       
         return cur;
     }
 
@@ -155,6 +170,8 @@ public:
         activePlaces.fetch_sub(1, std::memory_order_acq_rel);//I have no idea what I have to set here
         return line;
     }
+
+   
 
     variant_types readNumber(size_t line, size_t offset, Type type) {
         switch (type) {
