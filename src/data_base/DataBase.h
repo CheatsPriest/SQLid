@@ -4,10 +4,14 @@
 #include <unordered_map>
 #include <shared_mutex>
 #include "files/Optimizer.h"
+#include <filesystem>
 
 //TO DO: Добавить подгрузку данных самой базы данных при запуске
 class DataBase {
 private:
+
+	std::string absoluteWay;
+	std::string dataBaseName;
 
 	Optimizer optim;
 
@@ -20,7 +24,6 @@ private:
 	size_t getTabbleId(const std::string& name) const {
 		std::shared_lock<std::shared_mutex> lock(map_mtx);
 		return tabbles_name.at(name);
-		
 	}
 
 	void insertTabble(std::unique_ptr<Tabble> tabble, const std::string& name) {
@@ -29,17 +32,32 @@ private:
 		tabbles.push_back(std::move(tabble));
 	}
 
-public:
+	void loadFoldersAndOpenTabbles() {
+		try {
+			for (const auto& entry : std::filesystem::directory_iterator(absoluteWay)) {
+				if (entry.is_directory()) {
+					openTabble(entry.path().filename().string());
+				}
+			}
+		}
+		catch (const std::filesystem::filesystem_error& e) {
+			throw e;
+		}
+	}
 
-	DataBase() {
+public:
+	
+	DataBase(std::string absoluteWay_) : absoluteWay(absoluteWay_) {
 
 		tabbles.reserve(16);
-
+		loadFoldersAndOpenTabbles();
 	};
 
-	bool openTabble(std::string filename, std::string localName) {
+	bool openTabble(std::string localName) {
+		
+		std::cout << localName << std::endl;
 
-		auto cur = std::make_unique<Tabble>(filename);
+		auto cur = std::make_unique<Tabble>(absoluteWay + "\\" + localName + "\\" + localName);
 		
 		insertTabble(std::move(cur), localName);
 

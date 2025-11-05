@@ -7,46 +7,48 @@
 #include "parser/Conditions.h"
 #include "parser/RequestParser.h"
 #include "data_base/DataBase.h"
-#include <chrono>
 #include "data_base/Executor.h"
-
+#include <chrono>
 
 int main()
 {
 
 	
 
-	DataBase base;
+	DataBase base("C:\\TestDataBase\\base1");
 	Executor exec;
 
-	base.openTabble("C:\\TestDataBase\\test", "test");
+	//base.openTabble("C:\\TestDataBase\\test", "test");
 
 	RequestParser parser;
 
 	auto update1 = parser.parse("UPDATE test SET name = ""BUBU"" WHERE id == 4");
 	auto insert1 = parser.parse("INSERT INTO test 100 WUWU");
-	auto select1 = parser.parse("SELECT age name FROM test");
+	auto select1 = parser.parse("SELECT num FROM nums");
 	auto delete1 = parser.parse("DELETE FROM test WHERE age == 100");
 
+	auto insert2 = parser.parse("INSERT INTO nums 24252525");
+	base.optimizing(insert2);
 	
+
 	base.optimizing(update1);
 	base.optimizing(insert1);
 	base.optimizing(select1);
 	base.optimizing(delete1);
 
-	Result insertRes1, selectRes1, deleteRes1, updateRes1;
+	Result insertRes1, selectRes1, deleteRes1, updateRes1, insertRes2;
 
 	exec.execute(update1, updateRes1);
 	exec.execute(insert1, insertRes1);
 	//exec.execute(delete1, deleteRes1);
 	exec.execute(select1, selectRes1);
-	
+	exec.execute(insert2, insertRes2);
 
 
 
 	for (auto& row : selectRes1.body) {
 		if (row.size() == 0)break;
-		std::cout << std::get<int64_t>(row[0])<<" "<<" "<< std::get<int32_t>(row[1])<<" "<< std::get<std::string>(row[2]) << std::endl;
+		std::cout << std::get<int64_t>(row[0])<<" "<<" "<< std::get<int64_t>(row[1])<<std::endl;
 		std::cout << std::endl;
 	}
 
