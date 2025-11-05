@@ -11,50 +11,63 @@
 #include <chrono>
 #include "system/system.h"
 
+#include "clients/Operator.h"
+
 int main()
 {
+	Operator oper;
+	Client local;
+	local.baseId = 0;
 
-	Executor exec;
-	System sys("C:\\TestDataBase");
+	auto request = oper.execute(local,"SELECT age name FROM test");
+	request.print();
 
-	DataBase& base = sys.getDataBase("base1");
-
-	//DataBase base("C:\\TestDataBase\\base1");
 	//Executor exec;
+	//System sys("C:\\TestDataBase");
 
-	////base.openTabble("C:\\TestDataBase\\test", "test");
+	//DataBase& base = sys.getDataBase("base1");
 
-	RequestParser parser;
+	////DataBase base("C:\\TestDataBase\\base1");
+	////Executor exec;
 
-	auto update1 = parser.parse("UPDATE test SET name = ""BUBU"" WHERE id == 4");
-	auto insert1 = parser.parse("INSERT INTO test 100 WUWU");
-	auto select1 = parser.parse("SELECT age name FROM test");
-	auto delete1 = parser.parse("DELETE FROM test WHERE age == 100");
+	//////base.openTabble("C:\\TestDataBase\\test", "test");
 
-	auto insert2 = parser.parse("INSERT INTO nums 24252525");
-	base.optimizing(insert2);
-	
+	//RequestParser parser;
 
-	base.optimizing(update1);
-	base.optimizing(insert1);
-	base.optimizing(select1);
-	base.optimizing(delete1);
+	//auto update1 = parser.parse("UPDATE test SET name = ""BUBU"" WHERE id == 4");
+	//auto insert1 = parser.parse("INSERT INTO test 100 WUWU");
+	//auto select1 = parser.parse("SELECT age name FROM test");
+	//auto delete1 = parser.parse("DELETE FROM test WHERE age == 100");
 
-	Result insertRes1, selectRes1, deleteRes1, updateRes1, insertRes2;
+	//auto insert2 = parser.parse("INSERT INTO nums 24252525");
+	//base.optimizing(insert2);
+	//
 
-	exec.execute(update1, updateRes1);
-	exec.execute(insert1, insertRes1);
+	//base.optimizing(update1);
+	//base.optimizing(insert1);
+	//base.optimizing(select1);
+	//base.optimizing(delete1);
+
+	//Result insertRes1, selectRes1, deleteRes1, updateRes1, insertRes2;
+
+	//exec.execute(update1, updateRes1);
+	//exec.execute(insert1, insertRes1);
 	//exec.execute(delete1, deleteRes1);
-	exec.execute(select1, selectRes1);
-	exec.execute(insert2, insertRes2);
+	//exec.execute(select1, selectRes1);
+	//exec.execute(insert2, insertRes2);
 
 
+	//selectRes1.print();
 
+	/*for (auto& names : selectRes1.types) {
+		std::cout << names << " ";
+	}
+	std::cout << std::endl;
 	for (auto& row : selectRes1.body) {
 		if (row.size() == 0)break;
 		std::cout << std::get<int64_t>(row[0])<<" "<<" "<< std::get<int32_t>(row[1])<<" "<< std::get<std::string>(row[2]) << std::endl;
 		std::cout << std::endl;
-	}
+	}*/
 
 	//auto del1 = parser.parse("DELETE FROM test WHERE age == 100");
 	//auto replyDel1 = base.optimize(del1);

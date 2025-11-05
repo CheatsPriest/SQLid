@@ -2,6 +2,7 @@
 #include <variant>
 #include <string>
 #include <stdexcept>
+#include <unordered_map>
 
 using variant_types = std::variant<int32_t, int64_t, double, float, bool, std::string>;
 enum class Type { VOIDA = 0, INT32 = 1, INT64 = 2, DOUBLE = 3, FLOAT = 4, BOOL = 5, TEXT = 6, STRING = 7 };
@@ -38,3 +39,22 @@ static variant_types parse_value(const std::string& str, Type type) {
 		throw std::runtime_error("Unsupported type");
 	}
 }
+
+
+static std::unordered_map<std::string, Type> stringToType = {
+			{"VOID", Type::VOIDA}, {"INT32", Type::INT32},
+			{"INT64", Type::INT64}, {"DOUBLE", Type::DOUBLE},
+			{"FLOAT", Type::FLOAT}, {"BOOL", Type::BOOL},
+			{"TEXT", Type::TEXT}, {"STRING", Type::STRING}
+};
+
+static std::array<std::string, 8> typeToString = {
+	"VOID",  // VOIDA
+	"INT32",  // INT32
+	"INT64",  // INT64  
+	"DOUBLE",  // DOUBLE
+	"FLOAT",  // FLOAT
+	"BOOL",  // BOOL
+	"TEXT",  // TEXT 
+	"STRING"   // STRING - User decides on his own size
+};

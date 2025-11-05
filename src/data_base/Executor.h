@@ -66,6 +66,8 @@ private:
 
 	void executeSelect(SelectQuery& query, Result& result) {
 
+		result.messeage = "Selected";
+
 		auto& table = *query.table_ptr;
 		auto& storage = table.getStoarge();
 		auto info = table.getInfo();
@@ -73,6 +75,16 @@ private:
 		auto& conditions = query.conditions;
 		auto& columns_optimized = query.columns_optimized;
 		
+		result.header.reserve(columns_optimized.size()+1);
+		result.types.reserve(columns_optimized.size()+1);
+		result.header.push_back("ID");
+		result.types.push_back("INT64");
+		for (size_t ind : columns_optimized) {
+			result.header.push_back(columns[ind].name);
+			result.types.push_back(typeToString[(size_t)columns[ind].type]);
+		}
+
+
 
 		//  DIRECT INDEX - O(1) оптимизация
 		if (!conditions.empty() and conditions[0].cond_type == ConditionType::DIRECT_INDEX) {
@@ -101,6 +113,8 @@ private:
 
 		auto& table = *query.table_ptr;
 		auto info = table.getInfo();
+		result.header.push_back("ID");
+		result.types.push_back("INT64");
 
 		try {
 			result.messeage = std::format("Inserted into {}", table.insert(query.values, info->columns));
@@ -125,6 +139,8 @@ private:
 		auto& columns = info->columns;
 		auto& conditions = query.conditions;
 		
+		result.header.push_back("ID");
+		result.types.push_back("INT64");
 
 		//  DIRECT INDEX - O(1) оптимизация
 		if (!conditions.empty() && conditions[0].cond_type == ConditionType::DIRECT_INDEX) {
@@ -165,6 +181,9 @@ private:
 		auto& conditions = query.conditions;
 		auto& columns_optimized = query.columns_optimized;
 
+		result.header.push_back("ID");
+		result.types.push_back("INT64");
+
 		std::vector<Column> columns_to_update;
 		columns_to_update.reserve(columns_optimized.size());
 		for (size_t i : columns_optimized) {
@@ -198,6 +217,7 @@ private:
 
 			result.body.push_back({i});
 		}
+		
 
 	}
 
@@ -206,6 +226,8 @@ public:
 
 
 	void execute(QueryVariant& query, Result& res) {
+
+		res.isSucces = true;
 
 		std::visit([&res, this](auto& query) {
 			using T = std::decay_t<decltype(query)>;

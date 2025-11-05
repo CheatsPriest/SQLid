@@ -38,12 +38,7 @@ struct TabbleInfo
 class InfoLoader {
 private:
 
-	std::unordered_map<std::string, Type> stringToType = {
-			{"VOID", Type::VOIDA}, {"INT32", Type::INT32},
-			{"INT64", Type::INT64}, {"DOUBLE", Type::DOUBLE},
-			{"FLOAT", Type::FLOAT}, {"BOOL", Type::BOOL},
-			{"TEXT", Type::TEXT}, {"STRING", Type::STRING}
-	};
+	
 
 	std::ifstream  in; // поток для чтения
 	std::string& name;
