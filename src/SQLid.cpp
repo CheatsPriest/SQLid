@@ -9,22 +9,26 @@
 #include "data_base/DataBase.h"
 #include "data_base/Executor.h"
 #include <chrono>
+#include "system/system.h"
 
 int main()
 {
 
-	
-
-	DataBase base("C:\\TestDataBase\\base1");
 	Executor exec;
+	System sys("C:\\TestDataBase");
 
-	//base.openTabble("C:\\TestDataBase\\test", "test");
+	DataBase& base = sys.getDataBase("base1");
+
+	//DataBase base("C:\\TestDataBase\\base1");
+	//Executor exec;
+
+	////base.openTabble("C:\\TestDataBase\\test", "test");
 
 	RequestParser parser;
 
 	auto update1 = parser.parse("UPDATE test SET name = ""BUBU"" WHERE id == 4");
 	auto insert1 = parser.parse("INSERT INTO test 100 WUWU");
-	auto select1 = parser.parse("SELECT num FROM nums");
+	auto select1 = parser.parse("SELECT age name FROM test");
 	auto delete1 = parser.parse("DELETE FROM test WHERE age == 100");
 
 	auto insert2 = parser.parse("INSERT INTO nums 24252525");
@@ -48,7 +52,7 @@ int main()
 
 	for (auto& row : selectRes1.body) {
 		if (row.size() == 0)break;
-		std::cout << std::get<int64_t>(row[0])<<" "<<" "<< std::get<int64_t>(row[1])<<std::endl;
+		std::cout << std::get<int64_t>(row[0])<<" "<<" "<< std::get<int32_t>(row[1])<<" "<< std::get<std::string>(row[2]) << std::endl;
 		std::cout << std::endl;
 	}
 
