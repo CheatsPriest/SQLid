@@ -24,7 +24,7 @@ private:
 			const auto& col = columns[cond.collumn_id];
 			bool condition_met = false;
 
-			if (col.type == Type::TEXT || col.type == Type::STRING) {
+			if (col.type == Type::TEXT or col.type == Type::STRING) {
 				auto record_value = table.readText(line_id, col.offset, col.size);
 				condition_met = cond.result(std::string(record_value));
 			}
@@ -35,10 +35,10 @@ private:
 
 			// Применяем логический оператор
 			if (logic_op == ConditionType::LOGICAL_OR) {
-				current_result = current_result || condition_met;
+				current_result = current_result or condition_met;
 			}
 			else { // LOGICAL_AND
-				current_result = current_result && condition_met;
+				current_result = current_result and condition_met;
 			}
 		}
 

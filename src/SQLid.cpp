@@ -21,6 +21,7 @@ int main()
 	std::string buf;
 	while (true) {
 		std::getline(std::cin, buf);
+		if (buf == "0" or buf=="EXIT")break;
 		auto request = oper.execute(local, buf);//for example "SELECT age name FROM test"
 		request.print();
 	}

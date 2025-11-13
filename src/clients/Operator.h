@@ -37,11 +37,7 @@ public:
 			result.isSucces = false;
 			return result;
 		}
-		catch (...) {
-			result.error = "Unknown error";
-			result.isSucces = false;
-			return result;
-		}
+		
 		
 		
 		result.isSucces = true;

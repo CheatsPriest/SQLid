@@ -74,7 +74,7 @@ private:
 					try {
 						conditionType = condition_map.at(oper);
 					}
-					catch (std::runtime_error& error) {
+					catch (...) {
 						throw IncorrectInputException("Incorrect opearion: "+oper);
 					}
 

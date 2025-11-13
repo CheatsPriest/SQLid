@@ -80,7 +80,7 @@ class RequestParser {
 		if (buf != "SET") throw IncorrectInputException("Missed keyworld \"SET\"");
 
 		while (str >> buf) {
-			if (buf == "WHERE")break;
+			if (buf == "WHERE" or buf == "LIMIT")break;
 			result.columns_raw.push_back(std::move(buf));
 			str >> buf;
 			if(buf!="=")throw IncorrectInputException("Missed symbol \'=\'");
@@ -89,7 +89,7 @@ class RequestParser {
 		}
 
 
-		while (str >> buf) {
+		while (buf!="LIMIT" and str >> buf) {
 			if (buf == "LIMIT")break;
 			result.raw_conditions.push_back(std::move(buf));
 		}
