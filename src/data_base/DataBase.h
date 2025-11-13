@@ -23,7 +23,12 @@ private:
 
 	size_t getTabbleId(const std::string& name) const {
 		std::shared_lock<std::shared_mutex> lock(map_mtx);
-		return tabbles_name.at(name);
+		try {
+			return tabbles_name.at(name);
+		}
+		catch(...){
+			throw IncorrectInputException("Unknown table name: "+name);
+		}
 	}
 
 	void insertTabble(std::unique_ptr<Tabble> tabble, const std::string& name) {

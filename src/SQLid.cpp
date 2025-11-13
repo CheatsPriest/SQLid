@@ -18,9 +18,13 @@ int main()
 	Operator oper;
 	Client local;
 	local.baseId = 0;
-
-	auto request = oper.execute(local,"SELECT age name FROM test");
-	request.print();
+	std::string buf;
+	while (true) {
+		std::getline(std::cin, buf);
+		auto request = oper.execute(local, buf);//for example "SELECT age name FROM test"
+		request.print();
+	}
+	
 
 	//Executor exec;
 	//System sys("C:\\TestDataBase");

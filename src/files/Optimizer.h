@@ -34,7 +34,7 @@ private:
 					conditionType = ConditionType::LOGICAL_OR;
 				}
 				else {
-					throw std::runtime_error("Incoreect operation");
+					throw IncorrectInputException("Incorrect operation: "+oper);
 				}
 				Condition cur(conditionType, SIZE_MAX, 0);
 
@@ -48,7 +48,7 @@ private:
 					valueStr = std::move(raw_conditions.at(i + 2));
 				}
 				catch (std::out_of_range& erorr) {
-					throw std::out_of_range("Incorrect input");
+					throw IncorrectInputException("Incorrect conditions input");
 				}
 
 				if (columnName == "id" or columnName == "ID") {
@@ -61,7 +61,7 @@ private:
 						columnId = info->columns_map.at(columnName);
 					}
 					catch (std::runtime_error& error) {
-						throw std::runtime_error("Invalid column name");
+						throw IncorrectInputException("Incorrect column's name");
 					}
 
 					columnType = info->columns[columnId].type;
@@ -75,7 +75,7 @@ private:
 						conditionType = condition_map.at(oper);
 					}
 					catch (std::runtime_error& error) {
-						throw std::runtime_error("Incorrect operation");
+						throw IncorrectInputException("Incorrect opearion: "+oper);
 					}
 
 					Condition cur(conditionType, columnId, desired_value);
@@ -89,8 +89,13 @@ private:
 
 	template<typename T>
 	void optimizeColumns(T& query, std::shared_ptr<TabbleInfo>& info) {
-		for (auto& col : query.columns_raw) {
-			query.columns_optimized.push_back(info->columns_map.at(col));
+		try {
+			for (auto& col : query.columns_raw) {
+				query.columns_optimized.push_back(info->columns_map.at(col));
+			}
+		}
+		catch (...) {
+			throw IncorrectInputException("Error during columns comparison");
 		}
 		//columns_raw.clear(); 
 	}
@@ -98,20 +103,30 @@ private:
 	template<typename T>
 	void optimizeInsertValues(T& query, std::shared_ptr<TabbleInfo>& info) {
 
-		size_t i = 0;
-		for (Column& column : info->columns) {
-			query.values.push_back(parse_value(query.raw_values.at(i), column.type));
-			++i;
+		try {
+			size_t i = 0;
+			for (Column& column : info->columns) {
+				query.values.push_back(parse_value(query.raw_values.at(i), column.type));
+				++i;
+			}
+		}
+		catch (...) {
+			throw IncorrectInputException("Error during values comparison");
 		}
 
 	}
 	
 	void optimizeUpdateValues(UpdateQuery& query, std::shared_ptr<TabbleInfo>& info) {
 
-		size_t i = 0;
-		for (size_t id : query.columns_optimized) {
-			query.values.push_back(parse_value(query.raw_values.at(i), info->columns[id].type));
-			++i;
+		try {
+			size_t i = 0;
+			for (size_t id : query.columns_optimized) {
+				query.values.push_back(parse_value(query.raw_values.at(i), info->columns[id].type));
+				++i;
+			}
+		}
+		catch (...) {
+			throw IncorrectInputException("Error during columns comparison");
 		}
 
 	}

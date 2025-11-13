@@ -2,15 +2,8 @@
 #include "Query.h"
 #include <string>
 #include <sstream>
+#include "exceptions/Exceptions.h"
 
-class IncorrectInput : public std::exception {
-
-public:
-
-	const char* what() const noexcept override {
-		return "Incorrect input";
-	}
-};
 
 class RequestParser {
 
@@ -39,7 +32,7 @@ class RequestParser {
 			if (buf == "FROM")break;
 			result.columns_raw.push_back(std::move(buf));
 		}
-		if (buf != "FROM")throw IncorrectInput();
+		if (buf != "FROM")throw IncorrectInputException("Missed keyworld \"FROM\"");
 
 		str >> buf;
 		result.tabble_name = std::move(buf);
@@ -53,7 +46,7 @@ class RequestParser {
 		InsertQuery result;
 		std::string buf;
 		str >> buf;
-		if (buf != "INTO")throw IncorrectInput();
+		if (buf != "INTO")throw IncorrectInputException("Missed keyworld \"INTO\"");
 
 		str >> result.tabble_name;
 
@@ -68,7 +61,7 @@ class RequestParser {
 		DeleteQuery result;
 		std::string buf;
 		str >> buf;
-		if (buf != "FROM")throw IncorrectInput();
+		if (buf != "FROM")throw IncorrectInputException("Missed keyworld \"FROM\"");
 
 		str >> result.tabble_name;
 		
@@ -84,13 +77,13 @@ class RequestParser {
 		std::string buf;
 		str >> result.tabble_name;
 		str >> buf;
-		if (buf != "SET") throw IncorrectInput();
+		if (buf != "SET") throw IncorrectInputException("Missed keyworld \"SET\"");
 
 		while (str >> buf) {
 			if (buf == "WHERE")break;
 			result.columns_raw.push_back(std::move(buf));
 			str >> buf;
-			if(buf!="=")throw IncorrectInput();
+			if(buf!="=")throw IncorrectInputException("Missed symbol \'=\'");
 			str >> buf;
 			result.raw_values.push_back(std::move(buf));
 		}

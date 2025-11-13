@@ -20,12 +20,31 @@ public:
 		Result result;
 		DataBase& base = sys.getDataBaseById(client.baseId);
 
-		auto query = parser.parse(command);
+		try {
 
-		base.optimizing(query);
+			auto query = parser.parse(command);
+			base.optimizing(query);
+			exec.execute(query, result);
 
-		exec.execute(query, result);
-
+		}
+		catch (IncorrectInputException& error) {
+			result.error = error.what();
+			result.isSucces = false;
+			return result;
+		}
+		catch (ExecutionException& error) {
+			result.error = error.what();
+			result.isSucces = false;
+			return result;
+		}
+		catch (...) {
+			result.error = "Unknown error";
+			result.isSucces = false;
+			return result;
+		}
+		
+		
+		result.isSucces = true;
 		return result;
 	}
 
