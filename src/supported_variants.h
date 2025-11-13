@@ -3,6 +3,7 @@
 #include <string>
 #include <stdexcept>
 #include <unordered_map>
+#include "exceptions/Exceptions.h"
 
 using variant_types = std::variant<int32_t, int64_t, double, float, bool, std::string>;
 enum class Type { VOIDA = 0, INT32 = 1, INT64 = 2, DOUBLE = 3, FLOAT = 4, BOOL = 5, TEXT = 6, STRING = 7 };
@@ -20,7 +21,7 @@ static constexpr std::array<size_t, 8> type_sizes = {
 
 
 
-static variant_types parse_value(const std::string& str, Type type) {
+static variant_types parse_value(std::string& str, Type type, int size=0) {
 
 
 	switch (type) {
@@ -31,12 +32,13 @@ static variant_types parse_value(const std::string& str, Type type) {
 	case Type::BOOL:
 		if (str == "true" or str == "1") return variant_types{ true };
 		if (str == "false" or str == "0") return variant_types{ false };
-		throw std::runtime_error("Invalid boolean value: " + str);
+		throw IncorrectInputException("Invalid boolean value: " + str);
 	case Type::STRING:
 	case Type::TEXT:
+		str.resize(size, '\0');
 		return variant_types{ str }; 
 	default:
-		throw std::runtime_error("Unsupported type");
+		throw IncorrectInputException("Unsupported type");
 	}
 }
 

@@ -69,7 +69,7 @@ private:
 
 
 					const auto& column = info->columns[columnId];
-					variant_types desired_value = std::move(parse_value(valueStr, column.type));
+					variant_types desired_value = std::move(parse_value(valueStr, column.type, column.size));
 
 					try {
 						conditionType = condition_map.at(oper);
@@ -106,7 +106,7 @@ private:
 		try {
 			size_t i = 0;
 			for (Column& column : info->columns) {
-				query.values.push_back(parse_value(query.raw_values.at(i), column.type));
+				query.values.push_back(parse_value(query.raw_values.at(i), column.type, column.size));
 				++i;
 			}
 		}
@@ -121,7 +121,7 @@ private:
 		try {
 			size_t i = 0;
 			for (size_t id : query.columns_optimized) {
-				query.values.push_back(parse_value(query.raw_values.at(i), info->columns[id].type));
+				query.values.push_back(parse_value(query.raw_values.at(i), info->columns[id].type, info->columns[id].size));
 				++i;
 			}
 		}
