@@ -1,8 +1,10 @@
 #pragma once
+
 #include "system/system.h"
 #include "data_base/Executor.h"
 #include "parser/RequestParser.h"
 #include "clients/Client.h"
+
 #include <string>
 
 class Operator {
@@ -14,9 +16,9 @@ public:
 	Executor exec;
 	RequestParser parser;
 	Operator() : sys(path) {
-
+		
 	}
-	Result execute(const Client& client, const std::string command) {
+	Result execute(const ClientInfo& client, const std::string command) {
 		Result result;
 		DataBase& base = sys.getDataBaseById(client.baseId);
 

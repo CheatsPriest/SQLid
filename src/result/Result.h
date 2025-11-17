@@ -3,6 +3,7 @@
 #include <vector>
 #include "supported_variants.h"
 #include <iomanip>
+#include <boost/json.hpp>
 
 class Result {
 private:
@@ -70,6 +71,51 @@ public:
         }
 
         std::cout << "Total rows: " << body.size() << std::endl;
+    }
+
+    boost::json::value to_json() {  
+        boost::json::object result;
+
+        result["success"] = isSucces;
+
+        if (!isSucces) {
+            result["error"] = std::move(error);  
+            return result;
+        }
+
+        if (!messeage.empty()) {
+            result["message"] = std::move(messeage); 
+        }
+
+        // Заголовки и типы
+        if (!header.empty()) {
+            result["headers"] = boost::json::value_from(std::move(header));  
+        }
+
+        if (!types.empty()) {
+            result["types"] = boost::json::value_from(std::move(types));  
+        }
+
+        // Тело данных - преобразуем variant_types в JSON
+        if (!body.empty()) {
+            boost::json::array json_body;
+            json_body.reserve(body.size());  
+
+            for (auto& row : body) {
+                boost::json::array json_row;
+                json_row.reserve(row.size());
+
+                for (auto& cell : row) {
+                    json_row.push_back(boost::json::value_from(cell));  
+                }
+                json_body.push_back(std::move(json_row));
+            }
+            result["data"] = std::move(json_body);  
+        }
+
+        result["total_rows"] = body.size();
+
+        return result;
     }
 
 };

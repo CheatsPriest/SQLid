@@ -117,7 +117,7 @@ public:
 		else if (queryType == "DELETE") return parseDelete(str);
 		else if (queryType == "UPDATE") return parseUpdate(str);
 
-		throw std::runtime_error("Unsupported command");
+		throw IncorrectInputException("Unsupported command");
 	}
 
 };

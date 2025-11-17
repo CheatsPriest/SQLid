@@ -117,8 +117,9 @@ private:
 		result.types.push_back("INT64");
 
 		try {
-			result.messeage = std::format("Inserted into {}", table.insert(query.values, info->columns));
-
+			int64_t insertedTo = table.insert(query.values, info->columns);
+			result.messeage = std::format("Inserted into {}", insertedTo);
+			result.body.push_back({ insertedTo });
 
 			result.isSucces = true;
 		}
@@ -149,7 +150,7 @@ private:
 				table.erase(line_id);
 				result.isSucces = true;
 			}
-
+			result.body.push_back({ line_id });
 			return;
 		}
 

@@ -1,6 +1,6 @@
 ﻿// SQLid.cpp: определяет точку входа для приложения.
 //
-
+#include "clients/Operator.h"
 #include "SQLid.h"
 #include <thread>
 #include "files/InfoLoader.h"
@@ -10,21 +10,29 @@
 #include "data_base/Executor.h"
 #include <chrono>
 #include "system/system.h"
+#include "clients/SyncServer.h"
 
-#include "clients/Operator.h"
+
 
 int main()
 {
-	Operator oper;
-	Client local;
-	local.baseId = 0;
-	std::string buf;
-	while (true) {
-		std::getline(std::cin, buf);
-		if (buf == "0" or buf=="EXIT")break;
-		auto request = oper.execute(local, buf);//for example "SELECT age name FROM test"
-		request.print();
-	}
+
+	boost::asio::io_context cont;
+	SyncServer server(cont, 13);
+	int a;
+	server.start_accept();
+	while (true);
+
+	//Operator oper;//ddkb
+	//ClientInfo local(1, nullptr);
+	//local.baseId = 0;
+	//std::string buf;       
+	//while (true) {
+	//	std::getline(std::cin, buf);    
+	//	if (buf == "0" or buf=="EXIT")break;   
+	//	auto request = oper.execute(local, buf);//for example "SELECT age name FROM test"
+	//	request.print();
+	//}
 	
 
 	//Executor exec;

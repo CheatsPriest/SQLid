@@ -60,7 +60,7 @@ private:
 					try {
 						columnId = info->columns_map.at(columnName);
 					}
-					catch (std::runtime_error& error) {
+					catch (...) {
 						throw IncorrectInputException("Incorrect column's name");
 					}
 

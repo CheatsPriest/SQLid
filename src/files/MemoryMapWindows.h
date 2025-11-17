@@ -1,11 +1,67 @@
 #pragma once
-#include <windows.h>
+
+#define WIN32_LEAN_AND_MEAN
+#define NOMINMAX
+#define NOGDI
+#define NOUSER
+#define NOSOUND
+#define NOMSG
+#define NOMCX
+#define NOIME
+#define NOSERVICE
+#define NOATOM
+#define NOKANJI
+#define NOKERNEL
+#define NOSHLWAPI
+#define NODRAWTEXT
+#define NOMB
+#define NOWH
+#define NOCOMM
+#define NOPROFILER
+#define NOMINMAX
+#define NCrypt
+#define NOGDICAPMASKS
+#define NOCTLMGR
+#define NODEFERWINDOWPOS
+#define NOHELP
+#define NOMACROS
+#define NOPROXYSTUB
+#define NORPC
+#define NOSCROLL
+#define NOSHOWWINDOW
+#define NOTEXTMETRIC
+#define NOWINOFFSETS
+#define NOCOLOR
+#define NOHOTKEY
+#define NODESKTOP
+#define NOCLIPBOARD
+#define NOMEMMGR
+#define NOMETAFILE
+#define NOOPENFILE
+#define NORESOURCE
+#define NOTAPE
+#define NOWH
+#define NOWINMESSAGES
+#define NOWINOFFSETS
+#define NOWINSTYLES
+#define NOSYSMETRICS
+#define NOMENUS
+#define NOICONS
+#define NOKEYSTATES
+#define NOSYSCOMMANDS
+#define NORASTEROPS
+#define NOSHOWWINDOW
+#define NOATOM
+#define NOCRYPT
+#define NOMSG
+#include <Windows.h>
 #include <string>
 #include <stdexcept>
 #include <iostream>
 
 class MemoryMapWindows {
 private:
+	
 	HANDLE hFile = INVALID_HANDLE_VALUE;
 	HANDLE hMap = NULL;
 	void* mappedData = nullptr;

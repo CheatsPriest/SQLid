@@ -37,32 +37,23 @@ private:
         size_t ind = 0;
         while (ind < maxLine and storage.isActive(ind)) {
             ++ind;
-            activePlaces.fetch_add(1);
         }
         if (ind == maxLine)storage.expand();
 
-        maxLine = storage.getMaxLines() - 1;
+        maxLine = storage.getMaxLines();
 
-        while (true) {
-            if (storage.isActive(maxLine) or maxLine==ind) {
-                if(storage.isActive(ind))freeId = maxLine + 1;
-                else {
-                    freeId = maxLine;
-                }
-                activePlaces.fetch_add(1);
-                break;
-            }
-            maxLine--;
-        }
-
-        for (; ind < maxLine; ++ind) {
-            if (!storage.isActive(ind)) {
-                stack_freeId.push(ind);
-            }
-            else {
+        for (size_t i = 0; i < maxLine; ++i) {
+            if (storage.isActive(i)) {
+                freeId.store(i+1);
                 activePlaces.fetch_add(1);
             }
         }
+        for (size_t i = 0; i < freeId; ++i) {
+            if (!storage.isActive(i)) {
+                stack_freeId.push(i);
+            }
+        }
+        std::cout << "First free " << freeId << " " << stack_freeId.size()<<" "<<activePlaces << std::endl;
     }
 
     void pushInStack(size_t ind) {
@@ -160,7 +151,7 @@ public:
         size_t current_offset = 1; // Начинаем после флага активности
 
         update(values, columns, cur);
-       
+        activePlaces.fetch_add(1, std::memory_order_acq_rel);
         return cur;
     }
 
