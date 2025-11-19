@@ -5,6 +5,8 @@
 #include "parser/RequestParser.h"
 #include "clients/Client.h"
 
+#include "data_base/CommandsExecutor.h"
+
 #include <string>
 
 class Operator {
@@ -13,8 +15,13 @@ private:
 
 public:
 	System sys;
+
 	Executor exec;
+	CommandsExecutor comExex;
+
 	RequestParser parser;
+	CommandsParser comParser;
+
 	Operator() : sys(path) {
 		
 	}
@@ -45,5 +52,36 @@ public:
 		result.isSucces = true;
 		return result;
 	}
+	Result executeCommand(ClientInfo& client, std::string& command) {
+		Result result;
+		DataBase& base = sys.getDataBaseById(client.baseId);
+		std::stringstream stream(std::move(command));
 
+		try {
+			auto com = comParser.parse(stream);
+			comExex.execute(com, result, client, sys);
+		}
+		catch (IncorrectInputException& error) {
+			result.error = error.what();
+			result.isSucces = false;
+			return result;
+		}
+		catch (ExecutionException& error) {
+			result.error = error.what();
+			result.isSucces = false;
+			return result;
+		}
+		
+
+
+		result.isSucces = true;
+		return result;
+	}
+
+	void createDataBase(const std::string& name) {
+		sys.createDataBase(name);
+	}
+	void createTableInDataBase(std::stringstream& stream) {
+		sys.createTable(stream);
+	}
 };

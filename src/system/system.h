@@ -3,13 +3,20 @@
 #include <string>
 #include <memory>
 #include <vector>
+#include <filesystem>
+#include <shared_mutex>
+
+namespace fs = std::filesystem;
 
 class System {
 private:
+	
 	std::string abosolutePath;
 
 	std::vector<std::unique_ptr<DataBase>> bases;
 	std::unordered_map<std::string, size_t> name_base;
+	std::shared_mutex bases_mtx;
+
 
 	void loadFoldersAndOpenBases() {
 		try {
@@ -48,12 +55,51 @@ public:
 		loadFoldersAndOpenBases();
 	}
 	DataBase& getDataBase(const std::string& name) {
+		std::shared_lock<std::shared_mutex> lock(bases_mtx);
 		return *bases.at(name_base.at(name));
 	}
 	DataBase& getDataBaseById(size_t ind) {
+		std::shared_lock<std::shared_mutex> lock(bases_mtx);
 		return *bases.at(ind);
 	}
 	size_t getDataBaseId(const std::string& name) {
+		std::shared_lock<std::shared_mutex> lock(bases_mtx);
 		return name_base.at(name);
+	}
+	void createDataBase(const std::string& name) {
+		
+
+		if (name.empty()) {
+			throw IncorrectInputException("Database name cannot be empty");
+		}
+
+		if (name.find_first_of("/\\?%*:|\"<>") != std::string::npos) {
+			throw IncorrectInputException("Database name contains invalid characters");
+		}
+
+		
+		fs::path db_path = fs::path(abosolutePath) / name;
+
+		
+		if (fs::exists(db_path)) {
+			throw IncorrectInputException("Database '" + name + "' already exists");
+		}
+
+		if (!fs::create_directory(db_path)) {
+			throw IncorrectInputException("Failed to create database directory: " + db_path.string());
+		}
+
+		auto base = std::make_unique<DataBase>(abosolutePath + "\\" + name);
+
+		std::unique_lock<std::shared_mutex> lock(bases_mtx);
+		size_t id = bases.size();
+		bases.push_back(std::move(base));
+		name_base.insert({ name , id });
+	}
+	void createTable(std::stringstream& stream) {
+		std::string buf;
+		stream >> buf;
+		auto& base = getDataBase(buf);
+		base.createTable(stream);
 	}
 };

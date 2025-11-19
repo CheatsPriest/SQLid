@@ -17,16 +17,19 @@
 int main()
 {
 
-	boost::asio::io_context cont;
+	boost::asio::io_context cont; 
 	SyncServer server(cont, 13);
 	int a;
 	server.start_accept();
 	while (true);
 
-	//Operator oper;//ddkb
-	//ClientInfo local(1, nullptr);
+	//Operator oper;//ddkb    b       
+	//ClientInfo local(1, nullptr);  
 	//local.baseId = 0;
-	//std::string buf;       
+	//std::string buf;    
+	////oper.createDataBase("TestCreated");
+	//std::stringstream stream("TestCreated newtest result BOOL time INT64 name STRING[10] velocity FLOAT month TEXT");
+	//oper.createTableInDataBase(stream);
 	//while (true) {
 	//	std::getline(std::cin, buf);    
 	//	if (buf == "0" or buf=="EXIT")break;   

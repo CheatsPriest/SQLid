@@ -186,12 +186,15 @@ public:
 		char* lineStart = findLine(lineNumber) + offset;
 		if (!lineStart) return std::string_view();
 
-
+		size_t actual_length = 0;
+		while (actual_length < size and lineStart[actual_length] != '\0') {
+			actual_length++;
+		}
 
 		//size_t maxLength = min(lineLength, fileSize - (lineStart - static_cast<char*>(mappedData)));
 		//size_t actualLength = strnlen(lineStart, maxLength);
 
-		return std::string_view(lineStart, size); 
+		return std::string_view(lineStart, actual_length);
 	}
 
 

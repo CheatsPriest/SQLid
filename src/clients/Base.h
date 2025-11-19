@@ -22,17 +22,18 @@ public:
     }
 
   
-    void send_json(const boost::json::value& json) {
+    boost::system::error_code send_json(const boost::json::value& json) {
         std::string json_str = boost::json::serialize(json); 
         size_t size = json_str.size();
 
         boost::system::error_code ec;
 
         boost::asio::write(socket_, boost::asio::buffer(&size, sizeof(size)), ec);
-        if (ec) throw boost::system::system_error(ec);
+        
         
         boost::asio::write(socket_, boost::asio::buffer(json_str), ec);
-        if (ec) throw boost::system::system_error(ec);
+        
+        return ec;
     }
 
     
@@ -80,6 +81,9 @@ public:
         : socket_(io_context)
     {
     }
+
+
+
 private:
    
 

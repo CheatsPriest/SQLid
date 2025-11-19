@@ -37,7 +37,7 @@ add_executable (SQLid
     "src/clients/SyncServer.h" 
     "src/clients/Base.h" 
     "src/exceptions/Exceptions.h"
-)
+ "src/parser/CommandsParser.h" "src/parser/Commands.h" "src/data_base/CommandsExecutor.h")
 
 # Директории include
 target_include_directories(SQLid PRIVATE src)

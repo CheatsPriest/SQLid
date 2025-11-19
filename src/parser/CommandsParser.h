@@ -1,0 +1,39 @@
+#pragma once
+#include <string>
+#include <sstream>
+#include "exceptions/Exceptions.h"
+#include "Commands.h"
+
+// CREATE DATABASE TestDataBase
+// CREATE TABLE FOR TestDataBase TestTable result BOOL time INT64 name STRING[10] velocity FLOAT month TEXT
+// ATTACH TO TestDataBase
+
+class CommandsParser {
+private:
+	
+public:
+	CommandsVariant parse(std::stringstream& stream) {
+		std::string buf;
+		stream >> buf;
+		if (buf == "CREATE") {
+			stream >> buf;
+			if (buf == "TABLE") {
+				stream >> buf;
+				if(buf=="FOR")
+					return CreateTableForDatabaseCommand(stream);
+			}
+			else if(buf == "DATABASE") {
+				stream >> buf;
+				return CreateDatabaseCommand(buf);
+			}
+		}
+		else if (buf == "ATTACH") {
+			stream >> buf;
+			if (buf == "TO") {
+				stream >> buf;
+				return AttachCommand(buf);
+			}
+		}
+		throw IncorrectInputException("Unknown command: " + buf);
+	}
+};
