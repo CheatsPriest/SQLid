@@ -19,10 +19,12 @@ int main()
 
 	boost::asio::io_context cont; 
 	SyncServer server(cont, 13);
-	int a;
-	server.start_accept();
-	while (true);
-
+	int a=1;
+	  
+	while (a) {
+		std::cin >> a;
+	}
+	server.shutdownAll();
 	//Operator oper;//ddkb    b       
 	//ClientInfo local(1, nullptr);  
 	//local.baseId = 0;

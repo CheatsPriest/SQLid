@@ -29,7 +29,7 @@ public:
         boost::system::error_code ec;
 
         boost::asio::write(socket_, boost::asio::buffer(&size, sizeof(size)), ec);
-        
+        if (ec)return ec;
         
         boost::asio::write(socket_, boost::asio::buffer(json_str), ec);
         
@@ -37,18 +37,18 @@ public:
     }
 
     
-    boost::json::value read_json() {
+    boost::system::error_code read_json(boost::json::value& json) {
         boost::system::error_code ec;
         size_t size;
         boost::asio::read(socket_, boost::asio::buffer(&size, sizeof(size)));
-        if (ec) throw boost::system::system_error(ec);
-        
+        if (ec) return ec;
+
         std::vector<char> buffer(size);
         boost::asio::read(socket_, boost::asio::buffer(buffer), ec);
-        if (ec) throw boost::system::system_error(ec);
+        if (ec) return ec;
 
-        return boost::json::parse(std::string(buffer.begin(), buffer.end()), ec);
-        
+        json = boost::json::parse(std::string(buffer.begin(), buffer.end()), ec);
+        return ec;
     }
     
     boost::system::error_code readText(std::string& in) {
@@ -72,7 +72,7 @@ public:
     }
 
     template<typename T>
-    boost::system::error_code sendNumber(T& message) {
+    boost::system::error_code sendNumber(T&& message) {
         boost::system::error_code error;
         socket_.write_some(boost::asio::buffer(&message, sizeof(T)), error);
         return error;
