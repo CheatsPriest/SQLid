@@ -1,25 +1,55 @@
-﻿cmake_minimum_required (VERSION 3.8)
+﻿cmake_minimum_required(VERSION 3.8)
 
-if (POLICY CMP0141)
-  cmake_policy(SET CMP0141 NEW)
-  set(CMAKE_MSVC_DEBUG_INFORMATION_FORMAT "$<IF:$<AND:$<C_COMPILER_ID:MSVC>,$<CXX_COMPILER_ID:MSVC>>,$<$<CONFIG:Debug,RelWithDebInfo>:EditAndContinue>,$<$<CONFIG:Debug,RelWithDebInfo>:ProgramDatabase>>")
+project("SQLid")
+
+# Настройка стандарта C++
+set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+# Автоопределение платформы
+if(WIN32)
+    message(STATUS "Building for Windows")
+    set(SQLID_WINDOWS 1)
+    
+    # MSVC specific settings
+    if(MSVC)
+        if(POLICY CMP0141)
+            cmake_policy(SET CMP0141 NEW)
+            set(CMAKE_MSVC_DEBUG_INFORMATION_FORMAT "$<IF:$<AND:$<C_COMPILER_ID:MSVC>,$<CXX_COMPILER_ID:MSVC>>,$<$<CONFIG:Debug,RelWithDebInfo>:EditAndContinue>,$<$<CONFIG:Debug,RelWithDebInfo>:ProgramDatabase>>")
+        endif()
+        
+        # Подавить предупреждения для MSVC
+        add_compile_options(/wd4267 /wd4018 /wd4715)
+    endif()
+    
+elseif(UNIX AND NOT APPLE)
+    message(STATUS "Building for Linux")
+    set(SQLID_LINUX 1)
 endif()
 
-project ("SQLid")
-
-# Найти Boost с компонентом JSON
-set(BOOST_ROOT "C:/boost_1_89_0")
-set(Boost_DIR "C:/boost_1_89_0/lib/cmake/Boost-1.89.0")
+# Поиск Boost
 set(Boost_USE_STATIC_LIBS ON)
+set(Boost_DEBUG ON)  # Для отладки поиска Boost
+
+if(SQLID_WINDOWS)
+    # Windows-specific Boost paths
+    set(BOOST_ROOT "C:/boost_1_89_0")
+    set(Boost_DIR "C:/boost_1_89_0/lib/cmake/Boost-1.89.0")
+    
+    # Помоги CMake найти Boost
+    set(BOOST_LIBRARYDIR "C:/boost_1_89_0/lib")
+    set(BOOST_INCLUDEDIR "C:/boost_1_89_0")
+endif()
+
+# Ищем только JSON (system обычно подтягивается автоматически)
 find_package(Boost REQUIRED COMPONENTS json)
 
-# Добавить исполняемый файл
-add_executable (SQLid 
+# Исходные файлы
+add_executable(SQLid 
     "src/SQLid.cpp" 
     "src/SQLid.h"   
     "src/files/MemoryMap.h" 
     "src/files/MemoryMap.cpp" 
-    "src/files/MemoryMapWindows.h" 
     "src/files/Tabble.h" 
     "src/files/InfoLoader.h" 
     "src/parser/RequestParser.h" 
@@ -40,22 +70,38 @@ add_executable (SQLid
     "src/parser/CommandsParser.h" 
     "src/parser/Commands.h" 
     "src/data_base/CommandsExecutor.h"
-"include/SQLid_API.h")
-
-# Директории include
-target_include_directories(SQLid PRIVATE src 
-    PUBLIC include )
-
-# Линковка с Boost
-target_link_libraries(SQLid PRIVATE 
-    Boost::json
-    ws2_32  # Для сетевых функций Windows, если используешь
+    "include/SQLid_API.h"
 )
 
-# Стандарт C++
-set_property(TARGET SQLid PROPERTY CXX_STANDARD 23)
+# Платформо-специфичные файлы
+if(SQLID_WINDOWS)
+    target_sources(SQLid PRIVATE "src/files/MemoryMapWindows.h")
+elseif(SQLID_LINUX)
+    target_sources(SQLid PRIVATE "src/files/MemoryMapLinux.h")
+endif()
 
-# Подавить некоторые предупреждения для MSVC
-if (MSVC)
-    target_compile_options(SQLid PRIVATE /wd4267 /wd4018 /wd4715)
+# Директории include
+target_include_directories(SQLid 
+    PRIVATE src 
+    PUBLIC include
+    PUBLIC ${Boost_INCLUDE_DIRS}
+)
+
+# Линковка
+target_link_libraries(SQLid PRIVATE 
+    Boost::json
+    # Boost::system обычно не нужен явно для json
+)
+
+# Платформо-специфичные библиотеки
+if(SQLID_WINDOWS)
+    target_link_libraries(SQLid PRIVATE ws2_32)
+elseif(SQLID_LINUX)
+    target_link_libraries(SQLid PRIVATE pthread)
+endif()
+
+# Для Linux в WSL - дополнительные флаги
+if(SQLID_LINUX)
+    target_compile_options(SQLid PRIVATE -pthread)
+    target_link_options(SQLid PRIVATE -pthread)
 endif()

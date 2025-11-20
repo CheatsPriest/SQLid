@@ -17,7 +17,7 @@
 int main()
 {
 
-	boost::asio::io_context cont; 
+	boost::asio::io_context cont;   
 	SyncServer server(cont, 13);
 	int a=1;
 	  

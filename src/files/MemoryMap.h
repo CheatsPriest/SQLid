@@ -2,7 +2,13 @@
 
 #include <string>
 #include <memory>
+
+#ifdef _WIN32
 #include "MemoryMapWindows.h"
+#elif __linux__
+#include "MemoryMapLinux.h"
+#endif
+
 #include <shared_mutex>
 #include <array>
 #include <vector>
@@ -28,8 +34,11 @@ private:
 	std::shared_mutex expand_end_mutex;
 	std::atomic<bool> expanding{ false };
 
-	
+#ifdef _WIN32
 	MemoryMapWindows core;
+#elif __linux__
+	MemoryMapLinux core;
+#endif
 public:
 	
 	bool expand() {
