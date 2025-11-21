@@ -11,7 +11,8 @@
 
 class Operator {
 private:
-	std::string path = "C:\\TestDataBase";
+	//std::string path = "C:/TestDataBase1";
+	std::string path = "testBase";
 
 public:
 	System sys;
@@ -54,9 +55,12 @@ public:
 	}
 	Result executeCommand(ClientInfo& client, std::string& command) {
 		Result result;
-		DataBase& base = sys.getDataBaseById(client.baseId);
+		std::cout << "started" << std::endl;
+		
+		std::cout << "geted" << std::endl;
 		std::stringstream stream(std::move(command));
-
+		std::cout << "streamed" << std::endl;
+		
 		try {
 			auto com = comParser.parse(stream);
 			comExex.execute(com, result, client, sys);

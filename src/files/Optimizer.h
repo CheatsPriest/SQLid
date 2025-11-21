@@ -104,9 +104,16 @@ private:
 	void optimizeInsertValues(T& query, std::shared_ptr<TabbleInfo>& info) {
 
 		try {
+			std::string buf;
 			size_t i = 0;
 			for (Column& column : info->columns) {
-				query.values.push_back(parse_value(query.raw_values.at(i), column.type, column.size));
+				if(column.type!=Type::TEXT and column.type != Type::STRING)
+					query.values.push_back(parse_value(query.raw_values.at(i), column.type, column.size));
+				else {
+					buf = query.raw_values.at(i);
+					buf.resize(column.size);
+					query.values.push_back(std::move(buf));
+				}
 				++i;
 			}
 		}

@@ -28,25 +28,26 @@ static std::unordered_map<std::string, ConditionType> condition_map{
 };
 
 static std::array<std::function<bool(variant_types, variant_types)>, 6> functions{
-    [](variant_types a, variant_types b) -> bool {
-    return std::visit([](auto&& x, auto&& y) -> bool {
-        using X = std::decay_t<decltype(x)>;
-        using Y = std::decay_t<decltype(y)>;
+    /*[](variant_types a, variant_types b) -> bool {
+        return std::visit([](auto&& x, auto&& y) -> bool {
+            using X = std::decay_t<decltype(x)>;
+            using Y = std::decay_t<decltype(y)>;
 
         
-        if constexpr (std::is_same_v<X, std::string> && std::is_same_v<Y, std::string>) {
-            return compareStringsUntilNull(x, y);
-        }
+            if constexpr (std::is_same_v<X, std::string> && std::is_same_v<Y, std::string>) {
+                return compareStringsUntilNull(x, y);
+            }
        
-        else if constexpr (!std::is_same_v<X, std::string> && !std::is_same_v<Y, std::string>) {
-            return x == y;
-        }
+            else if constexpr (!std::is_same_v<X, std::string> && !std::is_same_v<Y, std::string>) {
+                return x == y;
+            }
         
-        else {
-            throw std::runtime_error("Cannot compare string with number");
-        }
-    }, a, b);
-},  // EQUAL
+            else {
+                throw std::runtime_error("Cannot compare string with number");
+            }
+            }, a, b);
+        },*/  
+    [](variant_types a, variant_types b) -> bool { return a == b; },// EQUAL
     [](variant_types a, variant_types b) -> bool { return a != b; },   // NOT_EQUAL
     [](variant_types a, variant_types b) -> bool { return a > b; },   // GREATER
     [](variant_types a, variant_types b) -> bool { return a < b; },   // LESS

@@ -62,7 +62,7 @@ public:
 		
 		std::cout << localName << std::endl;
 
-		auto cur = std::make_unique<Tabble>(absoluteWay + "\\" + localName + "\\" + localName);
+		auto cur = std::make_unique<Tabble>(absoluteWay + "/" + localName + "/" + localName);
 		
 		insertTabble(std::move(cur), localName);
 
@@ -144,7 +144,7 @@ public:
         }
 
      
-        std::string info_path = absoluteWay + "\\" + table_name + "\\" + table_name + "_info.db";
+        std::string info_path = absoluteWay + "/" + table_name + "/" + table_name + "_info.db";
         std::ofstream info_file(info_path);
 
         // Записываем мета-информацию
@@ -168,7 +168,7 @@ public:
 
         info_file.close();
 
-        std::string storage_path = absoluteWay + "\\" + table_name + "\\" + table_name + "_storage.db";
+        std::string storage_path = absoluteWay + "/" + table_name + "/" + table_name + "_storage.db";
         std::ofstream storage_file(storage_path, std::ios::binary);
         storage_file.close();
         openTabble(table_name);

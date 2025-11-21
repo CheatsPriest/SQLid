@@ -22,10 +22,17 @@ private:
 		try {
 			bases.reserve(8);
 			size_t i = 0;
+
+			if (std::filesystem::is_empty(abosolutePath)) {
+				//std::cout << "Creating default database..." << std::endl;
+				createDataBase("default");
+				//std::filesystem::create_directory("default");
+			}
+
 			for (const auto& entry : std::filesystem::directory_iterator(abosolutePath)) {
 				if (entry.is_directory()) {
 					try {
-						auto base = std::make_unique<DataBase>(abosolutePath + "\\" + entry.path().filename().string());
+						auto base = std::make_unique<DataBase>(abosolutePath + "/" + entry.path().filename().string());
 						bases.push_back(std::move(base));
 						name_base.insert({ entry.path().filename().string() , i });
 						++i;
@@ -89,7 +96,7 @@ public:
 			throw IncorrectInputException("Failed to create database directory: " + db_path.string());
 		}
 
-		auto base = std::make_unique<DataBase>(abosolutePath + "\\" + name);
+		auto base = std::make_unique<DataBase>(abosolutePath + "/" + name);
 
 		std::unique_lock<std::shared_mutex> lock(bases_mtx);
 		size_t id = bases.size();

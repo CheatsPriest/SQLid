@@ -113,8 +113,12 @@ private:
 	void addNewClient(std::unique_ptr<BaseConnection>&& connection) {
 		std::unique_lock<std::shared_mutex> lock(add_mtx);
 		size_t curId = freeId++;
-		clients.insert({ curId, {curId, std::move(connection)} });
-		threads.insert({ curId, std::jthread(std::bind(&SyncServer::processQueries, this, std::placeholders::_1, curId))});
+		clients.emplace(curId, ClientInfo{ curId, std::move(connection) });
+
+		// »ли ¬ариант 2: явный вызов insert с std::pair
+		// clients.insert(std::make_pair(curId, ClientInfo{curId, std::move(connection)}));
+
+		threads.emplace(curId, std::jthread(std::bind(&SyncServer::processQueries, this, std::placeholders::_1, curId)));
 	}
 
 	void processQueries(std::stop_token st, size_t id){
@@ -127,6 +131,7 @@ private:
 		lock.unlock();
 		std::cout << "started connection" << std::endl;
 		boost::json::value js;
+
 		size_t num = 0;
 		std::string buf;
 		boost::system::error_code err;
@@ -141,6 +146,10 @@ private:
 			buf.resize(num, '\0');
 
 			err = connection.readText(buf);
+
+			
+			//boost::asio::read_until(connection.socket(), boost::asio::dynamic_buffer(buf), '\n');
+
 			if (err)break;
 
 			if (buf == "DISCONNECT") {

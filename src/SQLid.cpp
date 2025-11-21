@@ -12,17 +12,20 @@
 #include "system/system.h"
 #include "clients/SyncServer.h"
 
-
+//cmake .. -DCMAKE_CXX_STANDARD=23 
+//make -j4
+//./SQLid 
 
 int main()
 {
-
+	std::cout << "Size of size_t: " << sizeof(size_t) << std::endl;
+	std::cout << "Size of uint32_t: " << sizeof(uint32_t) << std::endl;
 	boost::asio::io_context cont;   
 	SyncServer server(cont, 13);
-	int a=1;
+	int a=1;    
 	  
 	while (a) {
-		std::cin >> a;
+		std::cin >> a;    
 	}
 	server.shutdownAll();
 	//Operator oper;//ddkb    b       
@@ -41,14 +44,14 @@ int main()
 	
 
 	//Executor exec;
-	//System sys("C:\\TestDataBase");
+	//System sys("C:/TestDataBase");
 
 	//DataBase& base = sys.getDataBase("base1");
 
-	////DataBase base("C:\\TestDataBase\\base1");
+	////DataBase base("C:/TestDataBase/base1");
 	////Executor exec;
 
-	//////base.openTabble("C:\\TestDataBase\\test", "test");
+	//////base.openTabble("C:/TestDataBase/test", "test");
 
 	//RequestParser parser;
 
@@ -153,13 +156,13 @@ int main()
 	std::cout << result.tabble_name << std::endl;
 	for (auto& el : result.columns_raw) {
 		std::cout <<"NAME "<< el << std::endl;
-	}
+	} 
 	for (auto& el : result.raw_conditions) {
 		std::cout << "CONDOTION "<<el << std::endl;
 	}
 	std::cout << result.limit << std::endl;*/
 
-	/*std::string files = "C:\\TestDataBase\\test";
+	/*std::string files = "C:/TestDataBase/test";
 
 	Tabble base1(files);
 

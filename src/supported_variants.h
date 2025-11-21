@@ -35,7 +35,6 @@ static variant_types parse_value(std::string& str, Type type, int size=0) {
 		throw IncorrectInputException("Invalid boolean value: " + str);
 	case Type::STRING:
 	case Type::TEXT:
-		str.resize(size, '\0');
 		return variant_types{ str }; 
 	default:
 		throw IncorrectInputException("Unsupported type");
