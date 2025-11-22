@@ -34,7 +34,7 @@ int main()
 	//local.baseId = 0;
 	//   
 	//oper.sys.restoreDatabase("base1backup", "base1");
-	  
+	     
 	//oper.createDataBase("TestCreated");
 	//std::stringstream stream("TestCreated newtest result BOOL time INT64 name STRING[10] velocity FLOAT month TEXT");
 	//oper.createTableInDataBase(stream);

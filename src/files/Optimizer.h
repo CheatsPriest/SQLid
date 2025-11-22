@@ -52,9 +52,21 @@ private:
 				}
 
 				if (columnName == "id" or columnName == "ID") {
-					variant_types target_id = static_cast<int64_t>(std::stoul(valueStr));
-					Condition cur(ConditionType::DIRECT_INDEX, 0, target_id);
-					conditions.push_back(std::move(cur));
+					if (oper == "==") {
+						variant_types target_id = static_cast<int64_t>(std::stoul(valueStr));
+						Condition cur(ConditionType::DIRECT_INDEX, 0, target_id);
+						conditions.insert(conditions.begin(), std::move(cur));
+					}
+					else if (oper == ">=") {
+						variant_types target_id = static_cast<int64_t>(std::stoul(valueStr));
+						Condition cur(ConditionType::FROM_INDEX, 0, target_id);
+						conditions.insert(conditions.begin(), std::move(cur));
+					}
+					else if (oper == "<=") {
+						variant_types target_id = static_cast<int64_t>(std::stoul(valueStr));
+						Condition cur(ConditionType::TO_INDEX, 0, target_id);
+						conditions.insert(conditions.begin(), std::move(cur));
+					}
 				}
 				else {
 					try {

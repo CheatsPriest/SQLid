@@ -3,7 +3,8 @@
 #include <functional>
 #include "supported_variants.h"
 
-enum class ConditionType { EQUAL=0, NOT_EQUAL=1, GREATER=2, LESS=3, AND=4, OR=5, LOGICAL_AND, LOGICAL_OR, DIRECT_INDEX };
+enum class ConditionType { EQUAL=0, NOT_EQUAL=1, GREATER=2, LESS=3, AND=4, OR=5, LOGICAL_AND, LOGICAL_OR, 
+    DIRECT_INDEX, TO_INDEX, FROM_INDEX };
 
 static bool compareStringsUntilNull(const std::string& a, const std::string& b) {
     // »щем длину до первого \0 в каждой строке

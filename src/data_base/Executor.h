@@ -94,14 +94,31 @@ private:
 		}
 
 		//  FULL SCAN с фильтрацией
+		int64_t i = 0, numOfIdConds = 0;
 		size_t max_line = table.getMaxActiveLine();
 		
+		for (auto& cond : conditions) {
+			if (cond.cond_type == ConditionType::TO_INDEX) {
+				max_line = std::get<int64_t>(cond.desired);
+				numOfIdConds++;
+			}
+			else if (cond.cond_type == ConditionType::FROM_INDEX) {
+				i = std::get<int64_t>(cond.desired);
+				numOfIdConds++;
+			}
+			else if (cond.cond_type == ConditionType::LOGICAL_AND or cond.cond_type == ConditionType::LOGICAL_OR) {
+				numOfIdConds++;
+			}
+			else break;
+		}
+		conditions = std::vector<Condition>(conditions.begin()+numOfIdConds, conditions.end());
+
 		size_t active_count = table.getActivePlaces();
 		active_count = active_count < query.limit ? active_count : query.limit;
 
 		result.body.reserve(active_count);
 
-		for (int64_t i = 0; i < max_line && result.body.size() < active_count; ++i) {
+		for (; i < max_line && result.body.size() < active_count; ++i) {
 			if (!storage.isActive(i)) continue;
 			if (!conditions.empty() and !satisfiesConditions(table, i, conditions, columns)) continue;
 
@@ -155,7 +172,18 @@ private:
 		}
 
 		//  FULL SCAN с фильтрацией
+		int64_t i = 0;
 		size_t max_line = table.getMaxActiveLine();
+
+		for (auto& cond : conditions) {
+			if (cond.cond_type == ConditionType::TO_INDEX) {
+				max_line = std::get<int64_t>(cond.desired);
+			}
+			else if (cond.cond_type == ConditionType::FROM_INDEX) {
+				i = std::get<int64_t>(cond.desired);
+			}
+			else break;
+		}
 
 		size_t active_count = table.getActivePlaces();
 		active_count = active_count < query.limit ? active_count : query.limit;
@@ -203,7 +231,18 @@ private:
 		}
 
 		//  FULL SCAN с фильтрацией
+		int64_t i = 0;
 		size_t max_line = table.getMaxActiveLine();
+
+		for (auto& cond : conditions) {
+			if (cond.cond_type == ConditionType::TO_INDEX) {
+				max_line = std::get<int64_t>(cond.desired);
+			}
+			else if (cond.cond_type == ConditionType::FROM_INDEX) {
+				i = std::get<int64_t>(cond.desired);
+			}
+			else break;
+		}
 
 		size_t active_count = table.getActivePlaces();
 		active_count = active_count < query.limit ? active_count : query.limit;
