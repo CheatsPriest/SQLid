@@ -7,6 +7,14 @@
 class CommandsExecutor {
 private:
 	
+
+	void showStructure(Result& res, System& sys) {
+
+		for (auto& base : sys.getBases()) {
+			res.body.push_back({ base->getBaseNameAndTablesNames() });
+		}
+	}
+
 public:
 	void execute(CommandsVariant& command, Result& res, ClientInfo& clientInfo, System& sys) {
 
@@ -33,7 +41,19 @@ public:
 				sys.createTable(command.stream);
 				res.messeage = "Table created";
 			}
-			
+			if constexpr (std::is_same_v<T, BackupDatabase>) {
+				sys.backUpDatabase(command.base, command.backup);
+				res.messeage = "Backuped";
+			}
+			if constexpr (std::is_same_v<T, RestoreDatabase>) {
+				sys.restoreDatabase(command.backup, command.base);
+				res.messeage = "Restored";
+			}
+			if constexpr (std::is_same_v<T, ShowStructure>) {
+				
+				showStructure(res, sys);
+				res.messeage = "Info:";
+			}
 
 			}, command);
 

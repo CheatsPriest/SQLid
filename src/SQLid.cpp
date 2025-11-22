@@ -11,28 +11,31 @@
 #include <chrono>
 #include "system/system.h"
 #include "clients/SyncServer.h"
-
+ 
 //cmake .. -DCMAKE_CXX_STANDARD=23 
 //make -j4
 //./SQLid 
 
-int main()
+int main()     
 {
 	std::cout << "Size of size_t: " << sizeof(size_t) << std::endl;
 	std::cout << "Size of uint32_t: " << sizeof(uint32_t) << std::endl;
 	boost::asio::io_context cont;   
 	SyncServer server(cont, 13);
-	int a=1;    
+	int a=1;      
 	  
-	while (a) {
+	while (a) { 
 		std::cin >> a;    
-	}
+	}  
 	server.shutdownAll();
-	//Operator oper;//ddkb    b       
+	//Operator oper;//ddkb    b         
 	//ClientInfo local(1, nullptr);  
+	//std::string buf;
 	//local.baseId = 0;
-	//std::string buf;    
-	////oper.createDataBase("TestCreated");
+	//   
+	//oper.sys.restoreDatabase("base1backup", "base1");
+	  
+	//oper.createDataBase("TestCreated");
 	//std::stringstream stream("TestCreated newtest result BOOL time INT64 name STRING[10] velocity FLOAT month TEXT");
 	//oper.createTableInDataBase(stream);
 	//while (true) {

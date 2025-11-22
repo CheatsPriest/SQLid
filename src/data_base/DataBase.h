@@ -52,7 +52,7 @@ private:
 
 public:
 	
-	DataBase(std::string absoluteWay_) : absoluteWay(absoluteWay_) {
+	DataBase(std::string absoluteWay_, std::string dataBaseName_) : dataBaseName(dataBaseName_),absoluteWay(absoluteWay_) {
 
 		tabbles.reserve(16);
 		loadFoldersAndOpenTabbles();
@@ -175,5 +175,13 @@ public:
 
        
     }
-	
+    auto getBaseNameAndTablesNames() {
+        std::string ans=dataBaseName+": [";
+        for (auto& [name, smth] : tabbles_name) {
+            ans += " " + name;
+        }
+        ans += " ] ";
+        return ans;
+    }
+    
 };

@@ -11,8 +11,8 @@
 
 class Operator {
 private:
-	//std::string path = "C:/TestDataBase1";
-	std::string path = "testBase";
+	std::string path = "C:/TestDataBase";
+	//std::string path = "testBase";
 
 public:
 	System sys;

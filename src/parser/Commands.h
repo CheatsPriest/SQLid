@@ -33,8 +33,34 @@ public:
 	}
 };
 
+class BackupDatabase : public CommandBase<BackupDatabase> {
+public:
+	const std::string base, backup;
+	BackupDatabase(const std::string& base_, const std::string& backup_) : base(base_), backup(backup_) {
+
+	}
+};
+class RestoreDatabase : public CommandBase<RestoreDatabase> {
+public:
+	const std::string base, backup;
+	RestoreDatabase(const std::string& backup_, const std::string& base_) : base(base_), backup(backup_) {
+
+	}
+};
+class ShowStructure : public CommandBase<ShowStructure> {
+public:
+	
+	ShowStructure(){
+
+	}
+};
+
+
 using CommandsVariant = std::variant<
 	AttachCommand,
 	CreateDatabaseCommand,
-	CreateTableForDatabaseCommand
+	CreateTableForDatabaseCommand,
+	BackupDatabase,
+	RestoreDatabase,
+	ShowStructure
 >;
