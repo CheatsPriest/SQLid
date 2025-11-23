@@ -11,7 +11,18 @@ High-performance file-based SQL database engine written in C++ from scratch
 - Backup System - Database backup and restore functionality
 - Cross-Platform - Works on Windows and Linux
 
-## Performance
+## SQLid Performance (12k records)
+
+| Operation          | Time (10k operations) | Time per query |
+|--------------------|----------------------|----------------|
+| Full scan (O(n))   | 59.8 sec             | ~6.0 ms        |
+| Index search (O(1))| 1.0 sec              | ~0.1 ms        |
+| Range query (O(m)) | 1.2 sec              | ~0.12 ms       |
+| Insert (O(1))      | 0.9 sec              | ~0.09 ms       |
+
+**Indexed search acceleration: 60x**
+
+## Asymptotic Performance
 
 | Operation | Complexity | Description |
 |-----------|------------|-------------|
@@ -22,6 +33,7 @@ High-performance file-based SQL database engine written in C++ from scratch
 | Full Scan | O(n) | n = total records |
 
 > Read asymptotics.md for more info
+
 
 ## Quick Start
 

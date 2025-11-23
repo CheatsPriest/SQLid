@@ -18,14 +18,15 @@
 
 int main()         
 {     
-	std::cout << "Size of size_t: " << sizeof(size_t) << std::endl;
-	std::cout << "Size of uint32_t: " << sizeof(uint32_t) << std::endl;
-	boost::asio::io_context cont;   
-	SyncServer server(cont, 13);
-	int a=1;      
-	       
-	while (a) { 
-		std::cin >> a;    
+	
+	boost::asio::io_context cont;
+	std::cout << "Enter port" << std::endl;
+	int port = 0, w = 1;
+	std::cin >> port;
+	SyncServer server(cont, port);
+	while (w) { 
+		std::cout << "ENTER 0 TO TURN OFF" << std::endl;
+		std::cin >> w;    
 	}  
 	server.shutdownAll();
 	//Operator oper;//ddkb    b         
