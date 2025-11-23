@@ -32,22 +32,28 @@ set(Boost_USE_STATIC_LIBS ON)
 set(Boost_DEBUG ON)  # Для отладки поиска Boost
 
 if(SQLID_WINDOWS)
-    # Сначала пытаемся найти Boost через CMake
-    find_package(Boost 1.89.0 QUIET)
     
-    # Если не нашли системный Boost, используем локальный
-    if(NOT Boost_FOUND)
-        set(BOOST_ROOT "C:/boost_1_89_0")
-        set(Boost_DIR "C:/boost_1_89_0/lib/cmake/Boost-1.89.0")
-        set(BOOST_LIBRARYDIR "${BOOST_ROOT}/lib")
-        set(BOOST_INCLUDEDIR "${BOOST_ROOT}")
+    if(DEFINED ENV{BOOST_ROOT})
+        set(BOOST_ROOT "$ENV{BOOST_ROOT}")
+    else()
         
-        # Повторяем поиск с локальным путём
-        find_package(Boost 1.89.0 REQUIRED)
+        if(EXISTS "C:/boost_1_89_0")
+            set(BOOST_ROOT "C:/boost_1_89_0")
+        elseif(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/boost_1_89_0")
+            set(BOOST_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/boost_1_89_0")
+        else()
+           
+            set(BOOST_ROOT "")
+        endif()
     endif()
     
-    message(STATUS "Boost found: ${Boost_VERSION}")
-    message(STATUS "Boost libraries: ${Boost_LIBRARIES}")
+    if(BOOST_ROOT)
+        set(Boost_DIR "${BOOST_ROOT}/lib/cmake/Boost-1.89.0")
+        set(BOOST_LIBRARYDIR "${BOOST_ROOT}/lib")
+        set(BOOST_INCLUDEDIR "${BOOST_ROOT}")
+    endif()
+    
+    find_package(Boost 1.89.0 REQUIRED)
 endif()
 
 # Ищем только JSON (system обычно подтягивается автоматически)
