@@ -162,7 +162,7 @@ private:
 			if (buf == "LEAVE") {
 				Result request;
 				request.isSucces = true;
-				request.messeage = "LEAVED";
+				request.messeage = "LEFT";
 				err = connection.send_json(request.to_json());
 				client.joinedToDataBase = false;
 				continue;
@@ -185,5 +185,6 @@ private:
 			
 
 		}
+		std::cout << "Connection session ended" << std::endl;
 	}
 };

@@ -1,3 +1,5 @@
 /.vs
 /out
 /build
+/examples/ImGuiExample/.vs
+/examples/ImGuiExample/ImGuiExample/x64

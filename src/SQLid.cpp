@@ -23,7 +23,7 @@ int main()
 	boost::asio::io_context cont;   
 	SyncServer server(cont, 13);
 	int a=1;      
-	       
+	        
 	while (a) { 
 		std::cin >> a;    
 	}  
@@ -107,7 +107,7 @@ int main()
 	//	std::cout << std::get<int64_t>(row[0])<<" "<<" "<< std::get<int32_t>(row[1])<<" "<< std::get<std::string>(row[2]) << std::endl;
 	//	std::cout << std::endl;
 	//}
-	//
+	//  
 
 	//{
 	//	auto insert = parser.parse("INSERT INTO test 100 ""NEWa""");
