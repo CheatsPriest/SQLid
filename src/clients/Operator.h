@@ -55,11 +55,8 @@ public:
 	}
 	Result executeCommand(ClientInfo& client, std::string& command) {
 		Result result;
-		std::cout << "started" << std::endl;
 		
-		std::cout << "geted" << std::endl;
 		std::stringstream stream(std::move(command));
-		std::cout << "streamed" << std::endl;
 		
 		try {
 			auto com = comParser.parse(stream);

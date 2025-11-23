@@ -123,13 +123,13 @@ private:
 
 	void processQueries(std::stop_token st, size_t id){
 
-		std::cout << "started connection"<<id << std::endl;
+		std::cout << "Started connection "<<id << std::endl;
 
 		std::shared_lock<std::shared_mutex> lock(add_mtx);
 		ClientInfo& client = clients.at(id);
 		BaseConnection& connection = *client.connection;
 		lock.unlock();
-		std::cout << "started connection" << std::endl;
+		
 		boost::json::value js;
 
 		size_t num = 0;
@@ -185,6 +185,6 @@ private:
 			
 
 		}
-		std::cout << "Connection session ended" << std::endl;
+		std::cout << "Connection session ended: " << id << std::endl;
 	}
 };
