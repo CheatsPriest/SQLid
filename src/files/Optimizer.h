@@ -103,7 +103,15 @@ private:
 	void optimizeColumns(T& query, std::shared_ptr<TabbleInfo>& info) {
 		try {
 			for (auto& col : query.columns_raw) {
-				query.columns_optimized.push_back(info->columns_map.at(col));
+				if(col!="*")
+					query.columns_optimized.push_back(info->columns_map.at(col));
+				else
+				{
+					size_t idCol = 0;
+					for (auto& colName : info->columns) {
+						query.columns_optimized.push_back(idCol++);
+					}
+				}
 			}
 		}
 		catch (...) {

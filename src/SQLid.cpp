@@ -16,7 +16,7 @@
 //make -j4
 //./SQLid 
 
-int main()     
+int main()       
 {     
 	std::cout << "Size of size_t: " << sizeof(size_t) << std::endl;
 	std::cout << "Size of uint32_t: " << sizeof(uint32_t) << std::endl;
