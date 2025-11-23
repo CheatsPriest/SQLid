@@ -71,7 +71,7 @@ add_executable(SQLid
     "src/parser/Commands.h" 
     "src/data_base/CommandsExecutor.h"
     "include/SQLid_API.h"
-)
+ "src/parser/Help.h")
 
 # Платформо-специфичные файлы
 if(SQLID_WINDOWS)

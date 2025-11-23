@@ -3,6 +3,7 @@
 #include "result/Result.h"
 #include "clients/Client.h"
 #include "system/system.h"
+#include "parser/Help.h"
 
 class CommandsExecutor {
 private:
@@ -58,6 +59,10 @@ public:
 			if constexpr (std::is_same_v<T, DropDatabase>) {
 				sys.deleteDatabase(command.base);
 				res.messeage = "Base dropped";
+			}
+			if constexpr (std::is_same_v<T, HelpCommand>) {
+				res.body = std::move(getHelp());
+				res.messeage = "Some info ...";
 			}
 
 			}, command);
