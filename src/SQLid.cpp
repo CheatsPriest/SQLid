@@ -17,7 +17,7 @@
 //./SQLid 
 
 int main()     
-{
+{  
 	std::cout << "Size of size_t: " << sizeof(size_t) << std::endl;
 	std::cout << "Size of uint32_t: " << sizeof(uint32_t) << std::endl;
 	boost::asio::io_context cont;   
@@ -32,7 +32,7 @@ int main()
 	//ClientInfo local(1, nullptr);  
 	//std::string buf;
 	//local.baseId = 0;
-	//   
+	//oper.sys.deleteDatabase("base11");
 	//oper.sys.restoreDatabase("base1backup", "base1");
 	     
 	//oper.createDataBase("TestCreated");

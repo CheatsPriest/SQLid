@@ -59,6 +59,13 @@ public:
 		else if (buf == "SHOW") {
 			return ShowStructure();
 		}
+		else if (buf == "DROP") {
+			stream >> buf;
+			if (buf == "DATABASE" or buf=="BASE") {
+				stream >> buf;
+				return DropDatabase(buf);
+			}
+		}
 		throw IncorrectInputException("Unknown command: " + buf);
 	}
 };

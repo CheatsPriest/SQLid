@@ -263,4 +263,7 @@ public:
 	
 		return bases;
 	}
+	auto& getMtx() {
+		return bases_mtx;
+	}
 };

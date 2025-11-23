@@ -176,6 +176,7 @@ public:
        
     }
     auto getBaseNameAndTablesNames() {
+        std::shared_lock<std::shared_mutex> lock(map_mtx);
         std::string ans=dataBaseName+": [";
         for (auto& [name, smth] : tabbles_name) {
             ans += " " + name;

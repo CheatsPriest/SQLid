@@ -54,7 +54,13 @@ public:
 
 	}
 };
+class DropDatabase : public CommandBase<DropDatabase> {
+public:
+	const std::string base;
+	DropDatabase(const std::string& base_) : base(base_) {
 
+	}
+};
 
 using CommandsVariant = std::variant<
 	AttachCommand,
@@ -62,5 +68,6 @@ using CommandsVariant = std::variant<
 	CreateTableForDatabaseCommand,
 	BackupDatabase,
 	RestoreDatabase,
-	ShowStructure
+	ShowStructure,
+	DropDatabase
 >;

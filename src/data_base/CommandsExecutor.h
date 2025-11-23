@@ -9,9 +9,10 @@ private:
 	
 
 	void showStructure(Result& res, System& sys) {
-
+		std::shared_lock<std::shared_mutex> lock(sys.getMtx());
 		for (auto& base : sys.getBases()) {
-			res.body.push_back({ base->getBaseNameAndTablesNames() });
+			if(base.get()!=nullptr)
+				res.body.push_back({ base->getBaseNameAndTablesNames() });
 		}
 	}
 
@@ -53,6 +54,10 @@ public:
 				
 				showStructure(res, sys);
 				res.messeage = "Info:";
+			}
+			if constexpr (std::is_same_v<T, DropDatabase>) {
+				sys.deleteDatabase(command.base);
+				res.messeage = "Base dropped";
 			}
 
 			}, command);
