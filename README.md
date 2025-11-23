@@ -2,14 +2,21 @@
 
 High-performance file-based SQL database engine written in C++ from scratch
 
-## Features
+## Core Philosophy
 
-- Full SQL Support - SELECT, INSERT, UPDATE, DELETE with complex WHERE clauses
-- Multi-Threaded - Concurrent access with stripe-based locking
-- File-Based Storage - Direct file operations with memory mapping  
-- Network API - Remote connections via TCP/IP
-- Backup System - Database backup and restore functionality
-- Cross-Platform - Works on Windows and Linux
+SQLid builds on one fundamental principle: **ID is everything**. Unlike traditional databases where ID is just another column, in SQLid:
+
+- **ID is built-in** - Exists in every table by design
+- **Zero storage cost** - O(0) memory overhead  
+- **Always returned** - Every operation reveals affected IDs
+- **Non-creatable** - ID emerges from system, not user input
+
+## Why "SQLid"?
+
+The name reflects our architecture:
+- **SQL** - Full SQL support with complex queries
+- **id** - ID-centric design where identifiers drive everything
+
 
 ## SQLid Performance (12k records)
 
@@ -34,6 +41,14 @@ High-performance file-based SQL database engine written in C++ from scratch
 
 > Read asymptotics.md for more info
 
+## Features
+
+- Full SQL Support - SELECT, INSERT, UPDATE, DELETE with complex WHERE clauses
+- Multi-Threaded - Concurrent access with stripe-based locking
+- File-Based Storage - Direct file operations with memory mapping  
+- Network API - Remote connections via TCP/IP
+- Backup System - Database backup and restore functionality
+- Cross-Platform - Works on Windows and Linux
 
 ## Quick Start
 
