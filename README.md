@@ -13,7 +13,7 @@ SQLid builds on one fundamental principle: **ID is everything**. Unlike traditio
 
 ## Why "SQLid"?
 
-The name reflects our architecture:
+The name reflects architecture:
 - **SQL** - Full SQL support with complex queries
 - **id** - ID-centric design where identifiers drive everything
 
