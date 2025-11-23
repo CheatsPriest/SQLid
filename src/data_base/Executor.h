@@ -134,10 +134,11 @@ private:
 		result.types.push_back("INT64");
 
 		try {
-			int64_t insertedTo = table.insert(query.values, info->columns);
-			result.messeage = std::format("Inserted into {}", insertedTo);
-			result.body.push_back({ insertedTo });
-
+			for (size_t i = 0; i < query.values.size(); i += info->columns.size()) {
+				int64_t insertedTo = table.insert(query.values, info->columns, i);
+				result.body.push_back({ insertedTo });
+			}
+			result.messeage = "Inserted";
 			result.isSucces = true;
 		}
 		catch (std::runtime_error& error) {

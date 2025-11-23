@@ -115,19 +115,33 @@ private:
 	template<typename T>
 	void optimizeInsertValues(T& query, std::shared_ptr<TabbleInfo>& info) {
 
+		if (query.raw_values.size() % info->columns.size() != 0) {
+			throw IncorrectInputException(
+				"Number of values (" + std::to_string(query.raw_values.size()) +
+				") must be multiple of number of columns (" + std::to_string(info->columns.size()) + ")"
+			);
+		}
 		try {
 			std::string buf;
+			
+			size_t numToInsert = query.raw_values.size()/info->columns.size();
 			size_t i = 0;
-			for (Column& column : info->columns) {
-				if(column.type!=Type::TEXT and column.type != Type::STRING)
-					query.values.push_back(parse_value(query.raw_values.at(i), column.type, column.size));
-				else {
-					buf = query.raw_values.at(i);
-					buf.resize(column.size);
-					query.values.push_back(std::move(buf));
+
+			for (size_t in = 0; in < numToInsert; in++) {
+				
+
+				for (Column& column : info->columns) {
+					if (column.type != Type::TEXT and column.type != Type::STRING)
+						query.values.push_back(parse_value(query.raw_values.at(i), column.type, column.size));
+					else {
+						buf = query.raw_values.at(i);
+						buf.resize(column.size);
+						query.values.push_back(std::move(buf));
+					}
+					++i;
 				}
-				++i;
 			}
+			
 		}
 		catch (...) {
 			throw IncorrectInputException("Error during values comparison");

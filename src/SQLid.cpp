@@ -17,13 +17,13 @@
 //./SQLid 
 
 int main()     
-{  
+{     
 	std::cout << "Size of size_t: " << sizeof(size_t) << std::endl;
 	std::cout << "Size of uint32_t: " << sizeof(uint32_t) << std::endl;
 	boost::asio::io_context cont;   
 	SyncServer server(cont, 13);
 	int a=1;      
-	  
+	       
 	while (a) { 
 		std::cin >> a;    
 	}  

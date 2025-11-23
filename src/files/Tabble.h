@@ -125,11 +125,11 @@ public:
         return loader.getCurrentInfo();
     }
 
-    void update(const std::vector<variant_types>& values, const std::vector<Column>& columns, size_t cur) {
+    void update(const std::vector<variant_types>& values, const std::vector<Column>& columns, size_t cur, size_t indexValues=0) {
       
      
-        for (size_t i = 0; i < values.size(); ++i) {
-            auto& value = values[i];
+        for (size_t i = 0; i < columns.size(); ++i) {
+            auto& value = values[i+indexValues];
             auto& column = columns[i];
 
 
@@ -143,14 +143,14 @@ public:
         
     }
 
-    size_t insert(const std::vector<variant_types>& values, const std::vector<Column>& columns) {
+    size_t insert(const std::vector<variant_types>& values, const std::vector<Column>& columns, size_t index) {
         size_t cur = allocateId(); // Берём ID из free list
 
         storage.activate(cur);
 
         size_t current_offset = 1; // Начинаем после флага активности
 
-        update(values, columns, cur);
+        update(values, columns, cur, index);
         activePlaces.fetch_add(1, std::memory_order_acq_rel);
         return cur;
     }
