@@ -1,5 +1,4 @@
-﻿// SQLid.cpp: определяет точку входа для приложения.
-//
+﻿
 #include "clients/Operator.h"
 #include "SQLid.h"
 #include <thread>
@@ -11,24 +10,64 @@
 #include <chrono>
 #include "system/system.h"
 #include "clients/SyncServer.h"
- 
+
+
 //cmake .. -DCMAKE_CXX_STANDARD=23 
 //make -j4
 //./SQLid 
 
-int main()         
+int main(int argc, char* argv[])
 {     
+	std::string path;
+	int port = 0;
+
+	if (argc == 3) {
+		try {
+			port = std::stoi(argv[1]);
+			path = argv[2];
+		}
+		catch (const std::exception& e) {
+			std::cerr << "Invalid arguments. Usage: " << argv[0] << " [port] [path]" << std::endl;
+			std::cerr << "Or run without arguments for interactive mode." << std::endl;
+			return 1;
+		}
+	}
 	
+	else if (argc == 1) {
+		std::cout << "SQLid Server Setup" << std::endl;
+		std::cout << "==================" << std::endl;
+
+		std::cout << "Enter port: ";
+		std::cin >> port;
+
+		std::cout << "Enter working path: ";
+		std::cin >> path;
+	}
+	else {
+		std::cerr << "Usage: " << argv[0] << " [port] [path]" << std::endl;
+		std::cerr << "Examples:" << std::endl;
+		std::cerr << "  " << argv[0] << " 8080 ./data" << std::endl;
+		std::cerr << "  " << argv[0] << " (for interactive mode)" << std::endl;
+		return 1;
+	}
+
+	
+	if (port <= 0 or port > 65535) {
+		std::cerr << "Error: Port must be between 1 and 65535" << std::endl;
+		return 1;
+	}
+
 	boost::asio::io_context cont;
-	std::cout << "Enter port" << std::endl;
-	int port = 0, w = 1;
-	std::cin >> port;
-	SyncServer server(cont, port);
-	while (w) { 
+	SyncServer server(cont, port, path);
+	
+	for (int w = 1; w!=0;) {
 		std::cout << "ENTER 0 TO TURN OFF" << std::endl;
 		std::cin >> w;    
 	}  
 	server.shutdownAll();
+
+
+	//Archeology museum
 	//Operator oper;//ddkb    b         
 	//ClientInfo local(1, nullptr);  
 	//std::string buf;

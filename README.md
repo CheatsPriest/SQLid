@@ -56,8 +56,11 @@ The name reflects architecture:
 ```
 cmake .. -DCMAKE_CXX_STANDARD=23 
 make -j4
-./SQLid 
-# Set wanted port
+./SQLid [port] [working_path]
+OR
+./SQLid
+# Set wanted port using console
+# Set wanted path using console
 ```
 
 ### Clinet:

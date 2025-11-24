@@ -30,8 +30,8 @@ private:
 	std::jthread acceptor_thread;
 
 public:
-	SyncServer(boost::asio::io_context& io_context__, int port) : 
-		io_context_(io_context__), acceptor_(io_context__, tcp::endpoint(tcp::v4(), port)), quite{false}
+	SyncServer(boost::asio::io_context& io_context__, int port, std::string& workingPath) : 
+		io_context_(io_context__), acceptor_(io_context__, tcp::endpoint(tcp::v4(), port)), quite{false}, oper(workingPath)
 	{
 		acceptor_thread = std::jthread([this](std::stop_token st) {
 			accept_loop(st);
