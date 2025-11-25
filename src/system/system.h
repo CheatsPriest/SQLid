@@ -27,11 +27,7 @@ private:
 			bases.reserve(8);
 			size_t i = 0;
 
-			if (std::filesystem::is_empty(abosolutePath)) {
-				//std::cout << "Creating default database..." << std::endl;
-				createDataBase("default");
-				//std::filesystem::create_directory("default");
-			}
+			
 
 			for (const auto& entry : std::filesystem::directory_iterator(abosolutePath)) {
 				if (entry.is_directory()) {
@@ -48,6 +44,11 @@ private:
 
 					}
 				}
+			}
+			if (std::filesystem::is_empty(abosolutePath)) {
+				//std::cout << "Creating default database..." << std::endl;
+				createDataBase("default");
+				//std::filesystem::create_directory("default");
 			}
 			if (hasNotBackUp) {
 				std::filesystem::create_directory(abosolutePath+"/"+backUpName);
