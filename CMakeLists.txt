@@ -32,13 +32,28 @@ set(Boost_USE_STATIC_LIBS ON)
 set(Boost_DEBUG ON)  # Для отладки поиска Boost
 
 if(SQLID_WINDOWS)
-    # Windows-specific Boost paths
-    set(BOOST_ROOT "C:/boost_1_89_0")
-    set(Boost_DIR "C:/boost_1_89_0/lib/cmake/Boost-1.89.0")
     
-    # Помоги CMake найти Boost
-    set(BOOST_LIBRARYDIR "C:/boost_1_89_0/lib")
-    set(BOOST_INCLUDEDIR "C:/boost_1_89_0")
+    if(DEFINED ENV{BOOST_ROOT})
+        set(BOOST_ROOT "$ENV{BOOST_ROOT}")
+    else()
+        
+        if(EXISTS "C:/boost_1_89_0")
+            set(BOOST_ROOT "C:/boost_1_89_0")
+        elseif(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/boost_1_89_0")
+            set(BOOST_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/boost_1_89_0")
+        else()
+           
+            set(BOOST_ROOT "")
+        endif()
+    endif()
+    
+    if(BOOST_ROOT)
+        set(Boost_DIR "${BOOST_ROOT}/lib/cmake/Boost-1.89.0")
+        set(BOOST_LIBRARYDIR "${BOOST_ROOT}/lib")
+        set(BOOST_INCLUDEDIR "${BOOST_ROOT}")
+    endif()
+    
+    find_package(Boost 1.89.0 REQUIRED)
 endif()
 
 # Ищем только JSON (system обычно подтягивается автоматически)
@@ -71,7 +86,7 @@ add_executable(SQLid
     "src/parser/Commands.h" 
     "src/data_base/CommandsExecutor.h"
     "include/SQLid_API.h"
-)
+ "src/parser/Help.h")
 
 # Платформо-специфичные файлы
 if(SQLID_WINDOWS)

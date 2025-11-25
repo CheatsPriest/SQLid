@@ -66,6 +66,9 @@ public:
 				return DropDatabase(buf);
 			}
 		}
+		else if (buf == "HELP" or "help") {
+			return HelpCommand();
+		}
 		throw IncorrectInputException("Unknown command: " + buf);
 	}
 };

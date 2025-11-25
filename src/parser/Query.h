@@ -31,7 +31,14 @@ public:
 };
 
 
-
+struct oderTypeRaw {
+    std::string rawColumn;
+    bool isGreaterSort;
+};
+struct oderTypeOpt {
+    size_t rawId;
+    bool isGreaterSort;
+};
 class SelectQuery : public QueryBase<SelectQuery> {
 
 
@@ -42,7 +49,9 @@ public:
     std::vector<std::string> columns_raw;
     std::vector<size_t> columns_optimized;
 
-    
+    bool needToSort;
+    std::vector<oderTypeRaw> oder_columns_raw;
+    std::vector<oderTypeOpt> order_columns_optimized;
 	
 };
 

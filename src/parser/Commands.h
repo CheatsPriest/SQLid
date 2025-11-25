@@ -3,6 +3,8 @@
 #include <string>
 #include <variant>
 
+
+
 template<typename Derived>
 class CommandBase {
 public:
@@ -61,6 +63,12 @@ public:
 
 	}
 };
+class HelpCommand : public CommandBase<HelpCommand> {
+public:
+	HelpCommand() {
+
+	}
+};
 
 using CommandsVariant = std::variant<
 	AttachCommand,
@@ -69,5 +77,6 @@ using CommandsVariant = std::variant<
 	BackupDatabase,
 	RestoreDatabase,
 	ShowStructure,
-	DropDatabase
+	DropDatabase,
+	HelpCommand
 >;

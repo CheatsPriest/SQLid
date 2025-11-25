@@ -23,7 +23,7 @@ public:
 	RequestParser parser;
 	CommandsParser comParser;
 
-	Operator() : sys(path) {
+	Operator(std::string path_) : path(path_), sys(path_) {
 		
 	}
 	Result execute(const ClientInfo& client, const std::string command) {
