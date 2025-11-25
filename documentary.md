@@ -50,6 +50,18 @@ UPDATE table_name SET col1 = val1 ... colN = valN WHERE ...
 
 DELETE FROM table_name WHERE ... - 'WHERE' is required
 
+### Order by for SELECT
+
+ORDER BY MUST CONTAIN THE SAME COLUMNS TO SORT AS SELECT'S OUTPUT
+
+Example: table [name, age, salary]
+SELECT name FROM table WHERE cond LIMIT N ORDER BY age DESC - incorrect
+SELECT * FROM table WHERE cond LIMIT N ORDER BY age DESC - correct  
+SELECT * FROM table WHERE cond LIMIT N ORDER BY firstname DESC - incorrect
+
+> DESC and ASC supported as usual.
+ORDER BY must be at the end of query.
+
 ### Supported Types
 
 Integers: INT32, INT64
