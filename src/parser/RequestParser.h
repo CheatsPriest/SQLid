@@ -37,7 +37,35 @@ class RequestParser {
 		str >> buf;
 		result.tabble_name = std::move(buf);
 
-		parseConditionAndLimit(result, str);
+		str >> buf;
+		if (buf == "WHERE") {
+			while (str >> buf) {
+				if (buf == "LIMIT" or buf=="ORDER")break;
+				result.raw_conditions.push_back(std::move(buf));
+			}
+		}
+		if (buf == "LIMIT") {
+			str >> result.limit;
+			str >> buf;
+		}
+		if (buf == "ORDER") {
+			std::string type;
+			str >> buf;
+			if (buf == "BY") {
+				while (str >> buf) {
+					str >> type;
+					if (type == "ASC") {
+						result.oder_columns_raw.push_back({ buf, true });
+					}
+					else if (type == "DESC") {
+						result.oder_columns_raw.push_back({ buf, false });
+					}
+					else {
+						throw IncorrectInputException("Unknown sort type: " + type);
+					}
+				}
+			}
+		}
 
 		return result;
 	}

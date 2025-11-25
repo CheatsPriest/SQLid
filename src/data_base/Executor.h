@@ -3,6 +3,7 @@
 #include "parser/Query.h"
 #include "result/Result.h"
 #include <format>
+#include <algorithm>
 
 class Executor {
 private:
@@ -123,6 +124,20 @@ private:
 			if (!conditions.empty() and !satisfiesConditions(table, i, conditions, columns)) continue;
 
 			result.body.push_back(readRecord(table, i, columns_optimized, columns));
+		}
+
+		if(!query.order_columns_optimized.empty()){
+			std::sort(result.body.begin(), result.body.end(),
+				[&](const auto& a, const auto& b) {
+					for (const auto& clause : query.order_columns_optimized) {
+						if (a[clause.rawId] != b[clause.rawId]) {
+							return clause.isGreaterSort ?
+								(a[clause.rawId] > b[clause.rawId]) :
+								(a[clause.rawId] < b[clause.rawId]);
+						}
+					}
+					return false;
+				});
 		}
 	}
 

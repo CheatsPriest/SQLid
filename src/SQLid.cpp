@@ -11,16 +11,18 @@
 #include "system/system.h"
 #include "clients/SyncServer.h"
 
-
+   
 //cmake .. -DCMAKE_CXX_STANDARD=23 
 //make -j4
 //./SQLid 
 
 int main(int argc, char* argv[])
-{     
+{       
 	std::string path;
-	int port = 0;
 
+	int port = 0;
+	 
+	    
 	if (argc == 3) {
 		try {
 			port = std::stoi(argv[1]);

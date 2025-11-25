@@ -43,7 +43,7 @@ The name reflects architecture:
 
 ## Features
 
-- Full SQL Support - SELECT, INSERT, UPDATE, DELETE with complex WHERE clauses
+- Full SQL Support - SELECT, INSERT, UPDATE, DELETE with complex WHERE clauses **and ORDER BY**
 - Multi-Threaded - Concurrent access with stripe-based locking
 - File-Based Storage - Direct file operations with memory mapping  
 - Network API - Remote connections via TCP/IP
@@ -79,6 +79,7 @@ CREATE TABLE FOR mydb users name STRING[32] age INT32
 ATTACH TO mydb
 INSERT INTO users "John" 25
 SELECT * FROM users WHERE age > 20
+SELECT * FROM users LIMIT 10 ORDER BY name DESC age ASC
 UPDATE users SET age = 26 WHERE id == 1
 DELETE FROM users WHERE name == "John"
 ```

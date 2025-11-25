@@ -111,6 +111,7 @@ private:
 					for (auto& colName : info->columns) {
 						query.columns_optimized.push_back(idCol++);
 					}
+					break;
 				}
 			}
 		}
@@ -118,6 +119,38 @@ private:
 			throw IncorrectInputException("Error during columns comparison");
 		}
 		//columns_raw.clear(); 
+	}
+
+	
+	void optimizeOrdering(SelectQuery& query, std::shared_ptr<TabbleInfo>& info) {
+
+		for (auto& el : query.oder_columns_raw) {
+			if (el.rawColumn == "id" or el.rawColumn == "ID") {
+				query.order_columns_optimized.push_back({ 0, el.isGreaterSort });
+			}
+			else {
+				bool inserted = false;
+				for (size_t i = 0, n = query.columns_raw.size(); i < n; i++) {
+					if (query.columns_raw[i] == "*") {
+						try {
+							query.order_columns_optimized.push_back({ info->columns_map.at(el.rawColumn) + 1, el.isGreaterSort });
+							inserted = true;
+						}
+						catch (...) {
+							throw IncorrectInputException("This column does not exist: " + el.rawColumn);
+						}
+
+						break;
+					}
+					else if(query.columns_raw[i] == el.rawColumn) {
+						query.order_columns_optimized.push_back({ query.columns_optimized[i] + 1, el.isGreaterSort });
+						inserted = true;
+					}
+				}
+				if(!inserted)throw IncorrectInputException("This column does not exist: " + el.rawColumn);
+			}
+		}
+
 	}
 
 	template<typename T>
@@ -184,6 +217,7 @@ public:
 			if constexpr (std::is_same_v<T, SelectQuery>) {
 				optimizeConditions(query, info);
 				optimizeColumns(query, info);
+				optimizeOrdering(query, info);
 			}
 			if constexpr (std::is_same_v<T, InsertQuery>) {
 				optimizeInsertValues(query, info);

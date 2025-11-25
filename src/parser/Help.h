@@ -3,7 +3,7 @@
 #include <array>
 #include "supported_variants.h"
 
-static constexpr std::array<const char*, 36> helpArray = {
+static constexpr std::array<const char*, 45> helpArray = {
 	" ",
 	"*** SQLid Database System ***",
 	" ",
@@ -34,6 +34,15 @@ static constexpr std::array<const char*, 36> helpArray = {
 	"'INSERT INTO table_name val1 ... valN' - you can also insert multiple data using one insert",
 	"'UPDATE table_name SET col1 = val1 ... colN = valN WHERE ...'",
 	"'DELETE FROM table_name WHERE ...' - 'WHERE' is required",
+	" ",
+	"--- ORDER BY for SELECT ---",
+	"ORDER BY MUST CONTAIN THE SAME COLUMNS TO SORT AS SELECT'S OUTPUT",
+	"Example: table[name, age, salary]",
+	"SELECT name FROM table WHERE cond LIMIT N ORDER BY age DESC - incorrect",
+	"SELECT * FROM table WHERE cond LIMIT N ORDER BY age DESC - correct",
+	"SELECT * FROM table WHERE cond LIMIT N ORDER BY firstname DESC - incorrect",
+	"DESC and ASC supported as usual.",
+	"ORDER BY must be at the end of query.",
 	" ",
 	"=== Supported types ===",
 	"Integers: 'INT32', 'INT64'",
