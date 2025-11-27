@@ -24,7 +24,7 @@ public:
     std::vector<std::string> raw_conditions;
     size_t limit = SIZE_MAX;
 
-    // CRTP trick - доступ к производному классу
+    
     Derived& derived() { return static_cast<Derived&>(*this); }
     const Derived& derived() const { return static_cast<const Derived&>(*this); }
 
