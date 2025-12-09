@@ -143,8 +143,9 @@ private:
 						break;
 					}
 					else if(query.columns_raw[i] == el.rawColumn) {
-						query.order_columns_optimized.push_back({ query.columns_optimized[i] + 1, el.isGreaterSort });
+						query.order_columns_optimized.push_back({ i + 1, el.isGreaterSort });
 						inserted = true;
+						break;
 					}
 				}
 				if(!inserted)throw IncorrectInputException("This column does not exist: " + el.rawColumn);

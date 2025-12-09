@@ -126,8 +126,10 @@ private:
 			result.body.push_back(readRecord(table, i, columns_optimized, columns));
 		}
 
+		
 		if(!query.order_columns_optimized.empty()){
-			std::sort(result.body.begin(), result.body.end(),
+			
+			std::stable_sort(result.body.begin(), result.body.begin()+ result.body.size(),
 				[&](const auto& a, const auto& b) {
 					for (const auto& clause : query.order_columns_optimized) {
 						if (a[clause.rawId] != b[clause.rawId]) {
