@@ -1,6 +1,6 @@
 # SQLid Database Engine
 
-High-performance file-based SQL database engine written in C++ from scratch
+File-based SQL database engine written in C++ from scratch
 
 ## Core Philosophy
 
