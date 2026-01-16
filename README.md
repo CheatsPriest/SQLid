@@ -63,7 +63,7 @@ OR
 # Set wanted path using console
 ```
 
-### Clinet:
+### Client:
 ```cpp
 SQLid_API api(boost_contex, ip, port);
 api.connect();
